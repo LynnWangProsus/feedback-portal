@@ -133,6 +133,9 @@
     .spinner { width: 32px; height: 32px; border: 3px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin .8s linear infinite; margin: 0 auto 12px; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
+    .guided-entry { background: #F9FAFB; border: 1px solid var(--border); border-radius: 8px; padding: 16px; }
+    .feedback-section { margin-bottom: 4px; }
+
     @media (max-width: 600px) { .card { padding: 20px 16px; } .radio-group { flex-direction: column; } }
   </style>
 </head>
@@ -219,21 +222,78 @@
 
     <!-- CONTENT -->
     <div class="section-label">Your Feedback</div>
-    <div class="form-group">
-      <label>Categories <span style="color:var(--muted);font-weight:400;">(select all that apply)</span></label>
-      <div class="tags" id="tags-container"></div>
+
+    <!-- STRENGTHS -->
+    <div class="feedback-section">
+      <div class="section-label" style="color:var(--accent);margin-bottom:6px;">✅ Strengths</div>
+      <p style="font-size:.8rem;color:var(--muted);margin-bottom:14px;">Share what this team or person does well. You can add multiple observations.</p>
+      <div id="strengths-list">
+        <div class="guided-entry">
+          <div class="form-group" style="margin-bottom:8px;">
+            <label style="font-weight:400;color:var(--muted);">What did they do well?</label>
+            <textarea class="strengths-what" placeholder="e.g. Clear and proactive communication on complex topics" style="min-height:70px;"></textarea>
+          </div>
+          <div class="form-group" style="margin-bottom:8px;">
+            <label style="font-weight:400;color:var(--muted);">Describe the circumstances or give a specific example</label>
+            <textarea class="strengths-context" placeholder="e.g. When we needed urgent support during year-end close, they responded quickly and resolved the issue without escalation…" style="min-height:70px;"></textarea>
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <label style="font-weight:400;color:var(--muted);">Category <span style="font-style:italic;">(optional)</span></label>
+            <div class="tags entry-tags"></div>
+          </div>
+        </div>
+      </div>
+      <button type="button" class="btn btn-secondary btn-sm" onclick="addEntry('strengths')" style="margin-top:10px;">+ Add another strength</button>
     </div>
-    <div class="form-group">
-      <label>Strengths <span class="req">*</span></label>
-      <textarea id="strengths" placeholder="What is this team/person doing well?"></textarea>
+
+    <hr class="divider" />
+
+    <!-- AREAS TO IMPROVE -->
+    <div class="feedback-section">
+      <div class="section-label" style="color:#F59E0B;margin-bottom:6px;">🔧 Areas to Improve</div>
+      <p style="font-size:.8rem;color:var(--muted);margin-bottom:14px;">Share constructive observations. Be specific so feedback is actionable.</p>
+      <div id="improve-list">
+        <div class="guided-entry">
+          <div class="form-group" style="margin-bottom:8px;">
+            <label style="font-weight:400;color:var(--muted);">What could be improved?</label>
+            <textarea class="improve-what" placeholder="e.g. Clarity of outputs shared with other teams" style="min-height:70px;"></textarea>
+          </div>
+          <div class="form-group" style="margin-bottom:8px;">
+            <label style="font-weight:400;color:var(--muted);">Describe the circumstances or give a specific example</label>
+            <textarea class="improve-context" placeholder="e.g. When deadlines changed, our team was often informed at short notice…" style="min-height:70px;"></textarea>
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <label style="font-weight:400;color:var(--muted);">Category <span style="font-style:italic;">(optional)</span></label>
+            <div class="tags entry-tags"></div>
+          </div>
+        </div>
+      </div>
+      <button type="button" class="btn btn-secondary btn-sm" onclick="addEntry('improve')" style="margin-top:10px;">+ Add another area</button>
     </div>
-    <div class="form-group">
-      <label>Areas to Improve</label>
-      <textarea id="improvements" placeholder="What could be done better?"></textarea>
-    </div>
-    <div class="form-group">
-      <label>Additional Comments</label>
-      <textarea id="comments" placeholder="Any other thoughts or context…"></textarea>
+
+    <hr class="divider" />
+
+    <!-- OTHER COMMENTS -->
+    <div class="feedback-section">
+      <div class="section-label" style="margin-bottom:6px;">💬 Other Comments</div>
+      <p style="font-size:.8rem;color:var(--muted);margin-bottom:14px;">Anything else you'd like to share — context, suggestions, or general thoughts.</p>
+      <div id="other-list">
+        <div class="guided-entry">
+          <div class="form-group" style="margin-bottom:8px;">
+            <label style="font-weight:400;color:var(--muted);">Your comment</label>
+            <textarea class="other-what" placeholder="e.g. A dependable and collaborative team to work with…" style="min-height:70px;"></textarea>
+          </div>
+          <div class="form-group" style="margin-bottom:8px;">
+            <label style="font-weight:400;color:var(--muted);">Describe the circumstances or give a specific example <span style="font-style:italic;">(optional)</span></label>
+            <textarea class="other-context" placeholder="e.g. Especially evident during the annual reporting cycle…" style="min-height:70px;"></textarea>
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <label style="font-weight:400;color:var(--muted);">Category <span style="font-style:italic;">(optional)</span></label>
+            <div class="tags entry-tags"></div>
+          </div>
+        </div>
+      </div>
+      <button type="button" class="btn btn-secondary btn-sm" onclick="addEntry('other')" style="margin-top:10px;">+ Add another comment</button>
     </div>
 
     <button class="btn btn-primary" id="submit-btn" onclick="submitFeedback()" style="width:100%;margin-top:4px;">
@@ -341,8 +401,7 @@ const TAGS = [
   "Technical Skills","Responsiveness","Strategic Thinking","Data Quality"
 ];
 
-let allData      = [];
-let selectedTags = new Set();
+let allData = [];
 
 // ─── INIT ──────────────────────────────────────────────────────
 function init() {
@@ -362,20 +421,15 @@ function init() {
       o.value = t; o.textContent = t; el.appendChild(o);
     });
   });
-  // Tags (form)
-  const tc = document.getElementById('tags-container');
-  TAGS.forEach(tag => {
-    const s = document.createElement('span');
-    s.className = 'tag'; s.textContent = tag;
-    s.onclick = () => toggleTag(tag, s);
-    tc.appendChild(s);
-  });
-  // Tags (filter)
+  // Tags (admin filter)
   const ft = document.getElementById('filter-tag');
   TAGS.forEach(t => {
     const o = document.createElement('option');
     o.value = t; o.textContent = t; ft.appendChild(o);
   });
+
+  // Seed tag pills into all initial guided entries
+  document.querySelectorAll('.entry-tags').forEach(container => seedTags(container));
 
   // Share URL
   document.getElementById('share-url').value = window.location.href;
@@ -386,6 +440,21 @@ function init() {
     document.getElementById('setup-banner').style.display = 'none';
     document.getElementById('script-url-input').value = url;
   }
+}
+
+// ─── TAG PILLS PER ENTRY ──────────────────────────────────────
+function seedTags(container) {
+  TAGS.forEach(tag => {
+    const s = document.createElement('span');
+    s.className = 'tag';
+    s.textContent = tag;
+    s.onclick = () => { s.classList.toggle('selected'); };
+    container.appendChild(s);
+  });
+}
+
+function getSelectedTags(entry) {
+  return [...entry.querySelectorAll('.entry-tags .tag.selected')].map(t => t.textContent);
 }
 
 // ─── SCRIPT URL ────────────────────────────────────────────────
@@ -429,12 +498,6 @@ function selectPill(name, value, el) {
   if (name === 'to-type')   document.getElementById('to-name-group').style.display   = value === 'individual' ? 'block' : 'none';
 }
 
-// ─── TAGS ──────────────────────────────────────────────────────
-function toggleTag(tag, el) {
-  if (selectedTags.has(tag)) { selectedTags.delete(tag); el.classList.remove('selected'); }
-  else                       { selectedTags.add(tag);    el.classList.add('selected'); }
-}
-
 // ─── SUBMIT ────────────────────────────────────────────────────
 async function submitFeedback() {
   const scriptUrl = getScriptUrl();
@@ -446,20 +509,32 @@ async function submitFeedback() {
   const toTeam    = document.getElementById('to-team').value;
   const toType    = document.querySelector('[name="to-type"]:checked')?.value || 'team';
   const toName    = document.getElementById('to-name').value.trim();
-  const strengths = document.getElementById('strengths').value.trim();
-  const improve   = document.getElementById('improvements').value.trim();
-  const comments  = document.getElementById('comments').value.trim();
+
+  // Collect guided entries
+  const strengthsEntries = collectEntries('strengths');
+  const improveEntries   = collectEntries('improve');
+  const otherEntries     = collectEntries('other');
 
   if (!fromTeam)                               return showToast('Please select your team.', 'error');
   if (fromType === 'individual' && !fromName)  return showToast('Please enter your name.', 'error');
   if (!toTeam)                                 return showToast('Please select the team you are giving feedback to.', 'error');
   if (toType === 'individual' && !toName)      return showToast("Please enter the individual's name.", 'error');
-  if (!strengths)                              return showToast('Please fill in the Strengths field.', 'error');
+
+  const formatEntries = entries => entries.map((e, i) =>
+    `[${i+1}] ${e.what}${e.context ? '\nContext: '+e.context : ''}${e.tags.length ? '\nCategories: '+e.tags.join(', ') : ''}`
+  ).join('\n\n');
 
   const payload = {
     fromTeam, fromType, fromLabel: fromType === 'individual' ? fromName : fromTeam,
     toTeam,   toType,   toLabel:   toType   === 'individual' ? toName   : toTeam,
-    tags: [...selectedTags], strengths, improve, comments
+    tags: [...new Set([
+      ...strengthsEntries.flatMap(e => e.tags),
+      ...improveEntries.flatMap(e => e.tags),
+      ...otherEntries.flatMap(e => e.tags)
+    ])],
+    strengths: formatEntries(strengthsEntries),
+    improve:   formatEntries(improveEntries),
+    comments:  formatEntries(otherEntries)
   };
 
   const btn = document.getElementById('submit-btn');
@@ -488,12 +563,69 @@ function resetForm() {
   document.getElementById('form-container').style.display   = 'block';
   document.getElementById('success-container').style.display = 'none';
   ['from-team','to-team'].forEach(id => document.getElementById(id).value = '');
-  ['from-name','to-name','strengths','improvements','comments'].forEach(id => document.getElementById(id).value = '');
+  ['from-name','to-name','comments'].forEach(id => document.getElementById(id).value = '');
   ['from-name-group','to-name-group'].forEach(id => document.getElementById(id).style.display = 'none');
   document.querySelectorAll('.radio-pill').forEach(p => p.classList.remove('selected'));
   document.querySelectorAll('.radio-pill:first-of-type').forEach(p => p.classList.add('selected'));
   selectedTags.clear();
   document.querySelectorAll('#tags-container .tag').forEach(t => t.classList.remove('selected'));
+  // Reset guided entries — keep only first, clear values and tag selections
+  ['strengths','improve','other'].forEach(section => {
+    const list = document.getElementById(section + '-list');
+    [...list.querySelectorAll('.guided-entry')].forEach((e, i) => { if (i > 0) e.remove(); });
+    list.querySelectorAll('textarea').forEach(t => t.value = '');
+    list.querySelectorAll('.tag').forEach(t => t.classList.remove('selected'));
+  });
+}
+
+// ─── GUIDED ENTRIES ────────────────────────────────────────────
+function addEntry(section) {
+  const list  = document.getElementById(section + '-list');
+  const num   = list.querySelectorAll('.guided-entry').length + 1;
+  const isStr = section === 'strengths';
+  const isOth = section === 'other';
+
+  const whatLabel = isStr ? 'What did they do well?' : isOth ? 'Your comment' : 'What could be improved?';
+  const whatPH    = isStr ? 'e.g. Strong analytical thinking'
+                  : isOth ? 'e.g. Great team to collaborate with…'
+                  : 'e.g. Meeting preparation';
+  const ctxPH     = isStr ? 'e.g. During the budget review they identified a discrepancy no one else noticed…'
+                  : isOth ? 'e.g. Particularly during the year-end close process…'
+                  : 'e.g. Several meetings ran over time because materials were shared late…';
+  const ctxOptional = isOth ? ' <span style="font-style:italic;">(optional)</span>' : '';
+
+  const div = document.createElement('div');
+  div.className = 'guided-entry';
+  div.style.marginTop = '12px';
+  div.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+      <span style="font-size:.75rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;">Entry ${num}</span>
+      <button type="button" onclick="this.closest('.guided-entry').remove()" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:1rem;" title="Remove">✕</button>
+    </div>
+    <div class="form-group" style="margin-bottom:8px;">
+      <label style="font-weight:400;color:var(--muted);">${whatLabel}</label>
+      <textarea class="${section}-what" placeholder="${whatPH}" style="min-height:70px;"></textarea>
+    </div>
+    <div class="form-group" style="margin-bottom:8px;">
+      <label style="font-weight:400;color:var(--muted);">Describe the circumstances or give a specific example${ctxOptional}</label>
+      <textarea class="${section}-context" placeholder="${ctxPH}" style="min-height:70px;"></textarea>
+    </div>
+    <div class="form-group" style="margin-bottom:0;">
+      <label style="font-weight:400;color:var(--muted);">Category <span style="font-style:italic;">(optional)</span></label>
+      <div class="tags entry-tags"></div>
+    </div>`;
+  list.appendChild(div);
+  seedTags(div.querySelector('.entry-tags'));
+}
+
+function collectEntries(section) {
+  const list    = document.getElementById(section + '-list');
+  const entries = [...list.querySelectorAll('.guided-entry')];
+  return entries.map(entry => ({
+    what:    entry.querySelector(`.${section}-what`)?.value.trim()    || '',
+    context: entry.querySelector(`.${section}-context`)?.value.trim() || '',
+    tags:    getSelectedTags(entry)
+  })).filter(e => e.what || e.context);
 }
 
 // ─── ADMIN AUTH ────────────────────────────────────────────────
