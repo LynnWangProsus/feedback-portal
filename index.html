@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Team Feedback Portal</title>
+  <style>
+    :root {
+      --primary: #4F46E5;
+      --primary-light: #EEF2FF;
+      --primary-dark: #3730A3;
+      --accent: #10B981;
+      --danger: #EF4444;
+      --bg: #F9FAFB;
+      --card: #FFFFFF;
+      --border: #E5E7EB;
+      --text: #111827;
+      --muted: #6B7280;
+      --radius: 10px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+    /* ── NAV ── */
+    nav { background: var(--primary); color: #fff; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; height: 60px; box-shadow: 0 2px 8px rgba(0,0,0,.15); }
+    nav .logo { font-size: 1.1rem; font-weight: 700; }
+    nav .nav-links { display: flex; gap: 8px; }
+    nav button { background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.3); color: #fff; padding: 6px 16px; border-radius: 6px; cursor: pointer; font-size: .875rem; transition: background .2s; }
+    nav button:hover, nav button.active { background: rgba(255,255,255,.3); }
+
+    /* ── PAGES ── */
+    .page { display: none; max-width: 720px; margin: 40px auto; padding: 0 16px 60px; }
+    .page.active { display: block; }
+
+    /* ── CARD ── */
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px 32px; margin-bottom: 20px; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
+
+    h1 { font-size: 1.5rem; font-weight: 700; margin-bottom: 6px; }
+    h2 { font-size: 1.1rem; font-weight: 600; margin-bottom: 16px; color: var(--primary); }
+    .subtitle { color: var(--muted); font-size: .9rem; }
+
+    /* ── FORM ── */
+    .form-group { margin-bottom: 20px; }
+    label { display: block; font-weight: 500; font-size: .875rem; margin-bottom: 6px; }
+    label .req { color: var(--danger); margin-left: 2px; }
+    select, input[type="text"], input[type="password"], textarea {
+      width: 100%; padding: 9px 12px; border: 1px solid var(--border); border-radius: 7px;
+      font-size: .9rem; color: var(--text); background: #fff; transition: border-color .2s, box-shadow .2s; font-family: inherit;
+    }
+    select:focus, input:focus, textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(79,70,229,.12); }
+    textarea { resize: vertical; min-height: 90px; }
+
+    .radio-group { display: flex; gap: 12px; margin-top: 4px; flex-wrap: wrap; }
+    .radio-pill { display: flex; align-items: center; gap: 6px; padding: 7px 14px; border: 1px solid var(--border); border-radius: 20px; cursor: pointer; font-size: .875rem; transition: all .2s; user-select: none; }
+    .radio-pill input { display: none; }
+    .radio-pill:hover { border-color: var(--primary); background: var(--primary-light); }
+    .radio-pill.selected { border-color: var(--primary); background: var(--primary-light); color: var(--primary); font-weight: 600; }
+
+    .tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+    .tag { padding: 6px 14px; border: 1px solid var(--border); border-radius: 20px; cursor: pointer; font-size: .8rem; transition: all .2s; user-select: none; }
+    .tag:hover { border-color: var(--primary); background: var(--primary-light); }
+    .tag.selected { border-color: var(--primary); background: var(--primary); color: #fff; }
+
+    .divider { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
+    .section-label { font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .8px; color: var(--muted); margin-bottom: 14px; }
+
+    /* ── BUTTONS ── */
+    .btn { padding: 11px 28px; border-radius: 8px; font-size: .9rem; font-weight: 600; cursor: pointer; border: none; transition: all .2s; }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover { background: var(--primary-dark); }
+    .btn-primary:disabled { background: #a5b4fc; cursor: not-allowed; }
+    .btn-secondary { background: var(--border); color: var(--text); }
+    .btn-secondary:hover { background: #d1d5db; }
+    .btn-danger { background: var(--danger); color: #fff; }
+    .btn-danger:hover { background: #dc2626; }
+    .btn-sm { padding: 6px 14px; font-size: .8rem; }
+
+    /* ── TOAST ── */
+    #toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); background: #1F2937; color: #fff; padding: 12px 24px; border-radius: 8px; font-size: .875rem; font-weight: 500; box-shadow: 0 4px 16px rgba(0,0,0,.25); transition: transform .3s ease; z-index: 1000; white-space: nowrap; }
+    #toast.show { transform: translateX(-50%) translateY(0); }
+    #toast.success { background: var(--accent); }
+    #toast.error { background: var(--danger); }
+
+    /* ── SUCCESS ── */
+    .success-screen { text-align: center; padding: 48px 24px; }
+    .success-icon { width: 64px; height: 64px; border-radius: 50%; background: #D1FAE5; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 2rem; }
+    .success-screen h2 { color: var(--accent); font-size: 1.4rem; margin-bottom: 8px; }
+    .success-screen p { color: var(--muted); margin-bottom: 24px; }
+
+    /* ── SETUP BANNER ── */
+    .setup-banner { background: #FEF3C7; border: 1px solid #FDE68A; border-radius: var(--radius); padding: 16px 20px; margin-bottom: 20px; }
+    .setup-banner strong { color: #92400E; }
+    .setup-banner p { font-size: .875rem; color: #78350F; margin-top: 6px; }
+    .setup-banner input { margin-top: 10px; }
+    .setup-banner .btn { margin-top: 10px; }
+
+    /* ── SHARE BOX ── */
+    .share-box { background: var(--primary-light); border: 1px solid #C7D2FE; border-radius: 8px; padding: 14px 16px; display: flex; align-items: center; gap: 10px; margin-top: 16px; }
+    .share-box input { flex: 1; border: none; background: transparent; font-size: .8rem; color: var(--primary); outline: none; }
+
+    /* ── ADMIN LOGIN ── */
+    #admin-login { max-width: 400px; margin: 80px auto; padding: 0 16px; }
+    #admin-login .card { text-align: center; }
+    #admin-login h2 { margin-bottom: 4px; }
+    #admin-login p { color: var(--muted); font-size: .875rem; margin-bottom: 24px; }
+
+    /* ── ADMIN DASHBOARD ── */
+    #admin-dashboard { max-width: 960px; margin: 40px auto; padding: 0 16px 60px; }
+
+    .stats-row { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 20px; }
+    .stat-card { flex: 1; min-width: 120px; background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 20px; text-align: center; }
+    .stat-num { font-size: 1.8rem; font-weight: 700; color: var(--primary); }
+    .stat-label { font-size: .75rem; color: var(--muted); margin-top: 2px; }
+
+    .filter-bar { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+    .filter-bar select { flex: 1; min-width: 160px; }
+
+    .fb-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px 24px; margin-bottom: 14px; }
+    .fb-meta { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; align-items: center; }
+    .badge { padding: 3px 10px; border-radius: 20px; font-size: .75rem; font-weight: 600; }
+    .badge-from { background: #FEF3C7; color: #92400E; }
+    .badge-to { background: #DBEAFE; color: #1E40AF; }
+    .badge-tag { background: var(--primary-light); color: var(--primary); }
+    .fb-date { font-size: .75rem; color: var(--muted); margin-left: auto; }
+    .fb-section { margin-bottom: 10px; }
+    .fb-section-label { font-size: .75rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 4px; }
+    .fb-section-value { font-size: .875rem; line-height: 1.5; }
+
+    .empty-state { text-align: center; padding: 60px 20px; color: var(--muted); }
+    .empty-icon { font-size: 2.5rem; margin-bottom: 12px; }
+
+    .loading { text-align: center; padding: 40px; color: var(--muted); font-size: .9rem; }
+    .spinner { width: 32px; height: 32px; border: 3px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin .8s linear infinite; margin: 0 auto 12px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    @media (max-width: 600px) { .card { padding: 20px 16px; } .radio-group { flex-direction: column; } }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">📋 Team Feedback Portal</div>
+  <div class="nav-links">
+    <button class="active" id="nav-form" onclick="showPage('form-page', this)">Submit Feedback</button>
+    <button id="nav-admin" onclick="showPage('admin-wrapper', this)">Admin View</button>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════════════════════════════
+     FORM PAGE
+════════════════════════════════════════════════════════════ -->
+<div id="form-page" class="page active">
+
+  <!-- Setup banner (shown until script URL is configured) -->
+  <div class="setup-banner" id="setup-banner">
+    <strong>⚙️ Setup required</strong>
+    <p>Paste your Google Apps Script web app URL below to connect this portal to Google Sheets.</p>
+    <input type="text" id="script-url-input" placeholder="https://script.google.com/macros/s/.../exec" />
+    <br/>
+    <button class="btn btn-primary btn-sm" onclick="saveScriptUrl()">Save & Connect</button>
+  </div>
+
+  <div class="card" id="form-container">
+    <h1>Submit Feedback</h1>
+    <p class="subtitle">All submissions are anonymous. Your name is never stored unless you choose to add it.</p>
+    <hr class="divider" />
+
+    <!-- FROM -->
+    <div class="section-label">Feedback From</div>
+    <div class="form-group">
+      <label>Team <span class="req">*</span></label>
+      <select id="from-team">
+        <option value="">— Select your team —</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Submitting as</label>
+      <div class="radio-group">
+        <label class="radio-pill selected" onclick="selectPill('from-type','team',this)">
+          <input type="radio" name="from-type" value="team" checked /> Whole Team
+        </label>
+        <label class="radio-pill" onclick="selectPill('from-type','individual',this)">
+          <input type="radio" name="from-type" value="individual" /> Individual
+        </label>
+      </div>
+    </div>
+    <div class="form-group" id="from-name-group" style="display:none;">
+      <label>Your Name <span class="req">*</span></label>
+      <input type="text" id="from-name" placeholder="Enter your name" />
+    </div>
+
+    <hr class="divider" />
+
+    <!-- TO -->
+    <div class="section-label">Feedback To</div>
+    <div class="form-group">
+      <label>Team <span class="req">*</span></label>
+      <select id="to-team">
+        <option value="">— Select a team —</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Giving feedback to</label>
+      <div class="radio-group">
+        <label class="radio-pill selected" onclick="selectPill('to-type','team',this)">
+          <input type="radio" name="to-type" value="team" checked /> Whole Team
+        </label>
+        <label class="radio-pill" onclick="selectPill('to-type','individual',this)">
+          <input type="radio" name="to-type" value="individual" /> Specific Individual
+        </label>
+      </div>
+    </div>
+    <div class="form-group" id="to-name-group" style="display:none;">
+      <label>Individual's Name <span class="req">*</span></label>
+      <input type="text" id="to-name" placeholder="Enter their name" />
+    </div>
+
+    <hr class="divider" />
+
+    <!-- CONTENT -->
+    <div class="section-label">Your Feedback</div>
+    <div class="form-group">
+      <label>Categories <span style="color:var(--muted);font-weight:400;">(select all that apply)</span></label>
+      <div class="tags" id="tags-container"></div>
+    </div>
+    <div class="form-group">
+      <label>Strengths <span class="req">*</span></label>
+      <textarea id="strengths" placeholder="What is this team/person doing well?"></textarea>
+    </div>
+    <div class="form-group">
+      <label>Areas to Improve</label>
+      <textarea id="improvements" placeholder="What could be done better?"></textarea>
+    </div>
+    <div class="form-group">
+      <label>Additional Comments</label>
+      <textarea id="comments" placeholder="Any other thoughts or context…"></textarea>
+    </div>
+
+    <button class="btn btn-primary" id="submit-btn" onclick="submitFeedback()" style="width:100%;margin-top:4px;">
+      Submit Feedback Anonymously
+    </button>
+  </div>
+
+  <!-- Success screen -->
+  <div class="card" id="success-container" style="display:none;">
+    <div class="success-screen">
+      <div class="success-icon">✅</div>
+      <h2>Feedback Submitted!</h2>
+      <p>Your response has been saved to the central database. Thank you for sharing.</p>
+      <button class="btn btn-primary" onclick="resetForm()">Submit Another</button>
+    </div>
+  </div>
+
+  <!-- Share box -->
+  <div class="card">
+    <h2>📤 Share This Portal</h2>
+    <p style="font-size:.875rem;color:var(--muted);">Copy the link below and share with your team members.</p>
+    <div class="share-box">
+      <input type="text" id="share-url" readonly />
+      <button class="btn btn-primary btn-sm" onclick="copyLink()">Copy</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     ADMIN WRAPPER
+════════════════════════════════════════════════════════════ -->
+<div id="admin-wrapper" class="page">
+
+  <!-- Login -->
+  <div id="admin-login">
+    <div class="card">
+      <div style="font-size:2.5rem;margin-bottom:16px;">🔐</div>
+      <h2>Admin Access</h2>
+      <p>Enter the admin password to view all submissions.</p>
+      <div class="form-group">
+        <input type="password" id="admin-pwd-input" placeholder="Password" onkeydown="if(event.key==='Enter')checkAdminLogin()" />
+      </div>
+      <button class="btn btn-primary" style="width:100%;" onclick="checkAdminLogin()">Sign In</button>
+      <p id="login-error" style="color:var(--danger);font-size:.8rem;margin-top:10px;display:none;">Incorrect password.</p>
+    </div>
+  </div>
+
+  <!-- Dashboard -->
+  <div id="admin-dashboard" style="display:none;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px;">
+      <div>
+        <h1>Feedback Dashboard</h1>
+        <p class="subtitle" style="margin-top:4px;">Live data from Google Sheets</p>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn btn-secondary btn-sm" onclick="loadDashboard()">🔄 Refresh</button>
+        <button class="btn btn-secondary btn-sm" onclick="exportCSV()">⬇ Export CSV</button>
+        <button class="btn btn-secondary btn-sm" onclick="adminLogout()">Sign Out</button>
+      </div>
+    </div>
+
+    <div class="stats-row" id="stats-row"></div>
+
+    <div class="filter-bar">
+      <select id="filter-to-team" onchange="applyFilters()"><option value="">All Teams (To)</option></select>
+      <select id="filter-from-team" onchange="applyFilters()"><option value="">All Teams (From)</option></select>
+      <select id="filter-tag" onchange="applyFilters()"><option value="">All Categories</option></select>
+    </div>
+
+    <div id="fb-list"></div>
+
+    <!-- Settings -->
+    <div class="card" style="margin-top:32px;">
+      <h2>⚙️ Settings</h2>
+      <div class="form-group">
+        <label>Apps Script URL</label>
+        <div style="display:flex;gap:10px;">
+          <input type="text" id="admin-script-url" placeholder="https://script.google.com/macros/s/.../exec" style="flex:1;" />
+          <button class="btn btn-primary btn-sm" onclick="saveScriptUrlFromAdmin()">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<script>
+// ─── CONFIG ────────────────────────────────────────────────────
+const SCRIPT_URL_KEY = 'fb_portal_script_url';
+const AUTH_KEY       = 'fb_portal_admin_auth';
+const ADMIN_PWD      = 'Wynl590718$'; // Must match ADMIN_PWD in apps-script.gs
+
+const TEAMS = [
+  "Valuations team","KPMG team","Deloitte team","OLX team","iFood team",
+  "JET team","Despegar team","eMAG team","PayU team","TAL team",
+  "Stack Overflow team","GoodHabitz team","Iyzico team","SFP&A team",
+  "Shares Office team","Shares Estimate team","HR team",
+  "Financial Reporting team","Treasury team","Executive team","CoSec team"
+];
+
+const TAGS = [
+  "Communication","Collaboration","Delivery","Leadership",
+  "Technical Skills","Responsiveness","Strategic Thinking","Data Quality"
+];
+
+let allData      = [];
+let selectedTags = new Set();
+
+// ─── INIT ──────────────────────────────────────────────────────
+function init() {
+  // Populate team dropdowns
+  ['from-team','to-team'].forEach(id => {
+    const el = document.getElementById(id);
+    TEAMS.forEach(t => {
+      const o = document.createElement('option');
+      o.value = t; o.textContent = t; el.appendChild(o);
+    });
+  });
+  // Populate filter dropdowns
+  ['filter-to-team','filter-from-team'].forEach(id => {
+    const el = document.getElementById(id);
+    TEAMS.forEach(t => {
+      const o = document.createElement('option');
+      o.value = t; o.textContent = t; el.appendChild(o);
+    });
+  });
+  // Tags (form)
+  const tc = document.getElementById('tags-container');
+  TAGS.forEach(tag => {
+    const s = document.createElement('span');
+    s.className = 'tag'; s.textContent = tag;
+    s.onclick = () => toggleTag(tag, s);
+    tc.appendChild(s);
+  });
+  // Tags (filter)
+  const ft = document.getElementById('filter-tag');
+  TAGS.forEach(t => {
+    const o = document.createElement('option');
+    o.value = t; o.textContent = t; ft.appendChild(o);
+  });
+
+  // Share URL
+  document.getElementById('share-url').value = window.location.href;
+
+  // Script URL banner
+  const url = getScriptUrl();
+  if (url) {
+    document.getElementById('setup-banner').style.display = 'none';
+    document.getElementById('script-url-input').value = url;
+  }
+}
+
+// ─── SCRIPT URL ────────────────────────────────────────────────
+function getScriptUrl() {
+  return localStorage.getItem(SCRIPT_URL_KEY) || '';
+}
+function saveScriptUrl() {
+  const url = document.getElementById('script-url-input').value.trim();
+  if (!url.startsWith('https://script.google.com')) return showToast('Please enter a valid Apps Script URL.', 'error');
+  localStorage.setItem(SCRIPT_URL_KEY, url);
+  document.getElementById('setup-banner').style.display = 'none';
+  showToast('Connected to Google Sheets!', 'success');
+}
+function saveScriptUrlFromAdmin() {
+  const url = document.getElementById('admin-script-url').value.trim();
+  if (!url.startsWith('https://script.google.com')) return showToast('Invalid URL.', 'error');
+  localStorage.setItem(SCRIPT_URL_KEY, url);
+  showToast('URL saved!', 'success');
+}
+
+// ─── NAV ───────────────────────────────────────────────────────
+function showPage(id, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+
+  if (id === 'admin-wrapper') {
+    const loggedIn = sessionStorage.getItem(AUTH_KEY) === 'true';
+    document.getElementById('admin-login').style.display    = loggedIn ? 'none' : 'block';
+    document.getElementById('admin-dashboard').style.display = loggedIn ? 'block' : 'none';
+    if (loggedIn) loadDashboard();
+  }
+}
+
+// ─── RADIO PILLS ──────────────────────────────────────────────
+function selectPill(name, value, el) {
+  document.querySelectorAll(`[name="${name}"]`).forEach(r => r.parentElement.classList.remove('selected'));
+  el.classList.add('selected');
+  if (name === 'from-type') document.getElementById('from-name-group').style.display = value === 'individual' ? 'block' : 'none';
+  if (name === 'to-type')   document.getElementById('to-name-group').style.display   = value === 'individual' ? 'block' : 'none';
+}
+
+// ─── TAGS ──────────────────────────────────────────────────────
+function toggleTag(tag, el) {
+  if (selectedTags.has(tag)) { selectedTags.delete(tag); el.classList.remove('selected'); }
+  else                       { selectedTags.add(tag);    el.classList.add('selected'); }
+}
+
+// ─── SUBMIT ────────────────────────────────────────────────────
+async function submitFeedback() {
+  const scriptUrl = getScriptUrl();
+  if (!scriptUrl) return showToast('Please connect to Google Sheets first (see yellow banner).', 'error');
+
+  const fromTeam  = document.getElementById('from-team').value;
+  const fromType  = document.querySelector('[name="from-type"]:checked')?.value || 'team';
+  const fromName  = document.getElementById('from-name').value.trim();
+  const toTeam    = document.getElementById('to-team').value;
+  const toType    = document.querySelector('[name="to-type"]:checked')?.value || 'team';
+  const toName    = document.getElementById('to-name').value.trim();
+  const strengths = document.getElementById('strengths').value.trim();
+  const improve   = document.getElementById('improvements').value.trim();
+  const comments  = document.getElementById('comments').value.trim();
+
+  if (!fromTeam)                               return showToast('Please select your team.', 'error');
+  if (fromType === 'individual' && !fromName)  return showToast('Please enter your name.', 'error');
+  if (!toTeam)                                 return showToast('Please select the team you are giving feedback to.', 'error');
+  if (toType === 'individual' && !toName)      return showToast("Please enter the individual's name.", 'error');
+  if (!strengths)                              return showToast('Please fill in the Strengths field.', 'error');
+
+  const payload = {
+    fromTeam, fromType, fromLabel: fromType === 'individual' ? fromName : fromTeam,
+    toTeam,   toType,   toLabel:   toType   === 'individual' ? toName   : toTeam,
+    tags: [...selectedTags], strengths, improve, comments
+  };
+
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true; btn.textContent = 'Submitting…';
+
+  try {
+    const res = await fetch(scriptUrl, {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    });
+    const json = await res.json();
+    if (json.ok) {
+      document.getElementById('form-container').style.display   = 'none';
+      document.getElementById('success-container').style.display = 'block';
+    } else {
+      throw new Error(json.error || 'Unknown error');
+    }
+  } catch (err) {
+    showToast('Submission failed: ' + err.message, 'error');
+  } finally {
+    btn.disabled = false; btn.textContent = 'Submit Feedback Anonymously';
+  }
+}
+
+function resetForm() {
+  document.getElementById('form-container').style.display   = 'block';
+  document.getElementById('success-container').style.display = 'none';
+  ['from-team','to-team'].forEach(id => document.getElementById(id).value = '');
+  ['from-name','to-name','strengths','improvements','comments'].forEach(id => document.getElementById(id).value = '');
+  ['from-name-group','to-name-group'].forEach(id => document.getElementById(id).style.display = 'none');
+  document.querySelectorAll('.radio-pill').forEach(p => p.classList.remove('selected'));
+  document.querySelectorAll('.radio-pill:first-of-type').forEach(p => p.classList.add('selected'));
+  selectedTags.clear();
+  document.querySelectorAll('#tags-container .tag').forEach(t => t.classList.remove('selected'));
+}
+
+// ─── ADMIN AUTH ────────────────────────────────────────────────
+function checkAdminLogin() {
+  const pwd = document.getElementById('admin-pwd-input').value;
+  if (pwd === ADMIN_PWD) {
+    sessionStorage.setItem(AUTH_KEY, 'true');
+    document.getElementById('admin-login').style.display     = 'none';
+    document.getElementById('admin-dashboard').style.display = 'block';
+    const url = getScriptUrl();
+    if (url) document.getElementById('admin-script-url').value = url;
+    loadDashboard();
+  } else {
+    document.getElementById('login-error').style.display = 'block';
+  }
+}
+function adminLogout() {
+  sessionStorage.removeItem(AUTH_KEY);
+  document.getElementById('admin-dashboard').style.display = 'none';
+  document.getElementById('admin-login').style.display     = 'block';
+  document.getElementById('admin-pwd-input').value = '';
+}
+
+// ─── LOAD DATA ─────────────────────────────────────────────────
+async function loadDashboard() {
+  const scriptUrl = getScriptUrl();
+  const listEl = document.getElementById('fb-list');
+  listEl.innerHTML = `<div class="loading"><div class="spinner"></div>Loading submissions…</div>`;
+  document.getElementById('stats-row').innerHTML = '';
+
+  if (!scriptUrl) {
+    listEl.innerHTML = `<div class="empty-state"><div class="empty-icon">⚙️</div><p>Please configure the Apps Script URL in Settings below.</p></div>`;
+    return;
+  }
+
+  try {
+    const res  = await fetch(`${scriptUrl}?action=getData&pwd=${encodeURIComponent(ADMIN_PWD)}`);
+    const json = await res.json();
+    if (!json.ok) throw new Error(json.error || 'Failed to load data');
+    allData = json.data || [];
+    renderDashboard();
+  } catch (err) {
+    listEl.innerHTML = `<div class="empty-state"><div class="empty-icon">❌</div><p>Could not load data: ${escHtml(err.message)}</p></div>`;
+  }
+}
+
+// ─── RENDER DASHBOARD ──────────────────────────────────────────
+function applyFilters() { renderDashboard(); }
+
+function renderDashboard() {
+  const filterTo   = document.getElementById('filter-to-team').value;
+  const filterFrom = document.getElementById('filter-from-team').value;
+  const filterTag  = document.getElementById('filter-tag').value;
+
+  const filtered = allData.filter(e => {
+    if (filterTo   && e['To Team']   !== filterTo)            return false;
+    if (filterFrom && e['From Team'] !== filterFrom)          return false;
+    if (filterTag  && !(e['Categories']||'').includes(filterTag)) return false;
+    return true;
+  });
+
+  // Stats
+  const teamsWithFeedback = new Set(allData.map(e => e['To Team'])).size;
+  document.getElementById('stats-row').innerHTML = `
+    <div class="stat-card"><div class="stat-num">${allData.length}</div><div class="stat-label">Total Submissions</div></div>
+    <div class="stat-card"><div class="stat-num">${filtered.length}</div><div class="stat-label">Filtered Results</div></div>
+    <div class="stat-card"><div class="stat-num">${teamsWithFeedback}</div><div class="stat-label">Teams With Feedback</div></div>
+  `;
+
+  const listEl = document.getElementById('fb-list');
+  if (!filtered.length) {
+    listEl.innerHTML = `<div class="empty-state"><div class="empty-icon">💬</div><p>No submissions${filterTo||filterFrom||filterTag?' matching filters':''}.</p></div>`;
+    return;
+  }
+
+  listEl.innerHTML = filtered.map(e => {
+    const cats  = (e['Categories']||'').split(',').map(t=>t.trim()).filter(Boolean);
+    const tags  = cats.map(t => `<span class="badge badge-tag">${escHtml(t)}</span>`).join('');
+    return `
+      <div class="fb-card">
+        <div class="fb-meta">
+          <span class="badge badge-from">From: ${escHtml(e['From Label'])}</span>
+          <span class="badge badge-to">To: ${escHtml(e['To Label'])}</span>
+          ${tags}
+          <span class="fb-date">${escHtml(e['Timestamp']||'')}</span>
+        </div>
+        ${e['Strengths'] ? `<div class="fb-section"><div class="fb-section-label">✅ Strengths</div><div class="fb-section-value">${escHtml(e['Strengths'])}</div></div>` : ''}
+        ${e['Areas to Improve'] ? `<div class="fb-section"><div class="fb-section-label">🔧 Areas to Improve</div><div class="fb-section-value">${escHtml(e['Areas to Improve'])}</div></div>` : ''}
+        ${e['Comments'] ? `<div class="fb-section"><div class="fb-section-label">💬 Comments</div><div class="fb-section-value">${escHtml(e['Comments'])}</div></div>` : ''}
+      </div>`;
+  }).join('');
+}
+
+// ─── CSV EXPORT ────────────────────────────────────────────────
+function exportCSV() {
+  if (!allData.length) return showToast('No data to export.', 'error');
+  const headers = Object.keys(allData[0]);
+  const rows    = allData.map(e => headers.map(h => `"${String(e[h]||'').replace(/"/g,'""')}"`).join(','));
+  const csv     = [headers.map(h=>`"${h}"`).join(','), ...rows].join('\n');
+  const a       = document.createElement('a');
+  a.href        = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
+  a.download    = `feedback_export_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+}
+
+// ─── HELPERS ───────────────────────────────────────────────────
+function copyLink() {
+  navigator.clipboard.writeText(document.getElementById('share-url').value)
+    .then(() => showToast('Link copied!', 'success'))
+    .catch(() => showToast('Please copy manually.', 'error'));
+}
+
+function showToast(msg, type='') {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = type;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+function escHtml(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+init();
+</script>
+</body>
+</html>
