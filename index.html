@@ -91,8 +91,7 @@
     .setup-banner { background: #FEF3C7; border: 1px solid #FDE68A; border-radius: var(--radius); padding: 16px 20px; margin-bottom: 20px; }
     .setup-banner strong { color: #92400E; }
     .setup-banner p { font-size: .875rem; color: #78350F; margin-top: 6px; }
-    .setup-banner input { margin-top: 10px; }
-    .setup-banner .btn { margin-top: 10px; }
+    .setup-banner code { background: #FDE68A; padding: 1px 5px; border-radius: 3px; font-size: .8rem; }
 
     /* ── SHARE BOX ── */
     .share-box { background: var(--primary-light); border: 1px solid #C7D2FE; border-radius: 8px; padding: 14px 16px; display: flex; align-items: center; gap: 10px; margin-top: 16px; }
@@ -124,7 +123,7 @@
     .fb-date { font-size: .75rem; color: var(--muted); margin-left: auto; }
     .fb-section { margin-bottom: 10px; }
     .fb-section-label { font-size: .75rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 4px; }
-    .fb-section-value { font-size: .875rem; line-height: 1.5; }
+    .fb-section-value { font-size: .875rem; line-height: 1.5; white-space: pre-wrap; }
 
     .empty-state { text-align: center; padding: 60px 20px; color: var(--muted); }
     .empty-icon { font-size: 2.5rem; margin-bottom: 12px; }
@@ -141,6 +140,10 @@
 </head>
 <body>
 
+<!-- Firebase SDK v8 compat -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
 <nav>
   <div class="logo">📋 Team Feedback Portal</div>
   <div class="nav-links">
@@ -154,13 +157,10 @@
 ════════════════════════════════════════════════════════════ -->
 <div id="form-page" class="page active">
 
-  <!-- Setup banner (shown until script URL is configured) -->
-  <div class="setup-banner" id="setup-banner">
-    <strong>⚙️ Setup required</strong>
-    <p>Paste your Google Apps Script web app URL below to connect this portal to Google Sheets.</p>
-    <input type="text" id="script-url-input" placeholder="https://script.google.com/macros/s/.../exec" />
-    <br/>
-    <button class="btn btn-primary btn-sm" onclick="saveScriptUrl()">Save & Connect</button>
+  <!-- Setup banner (shown until Firebase is configured) -->
+  <div class="setup-banner" id="setup-banner" style="display:none;">
+    <strong>⚙️ Firebase not configured</strong>
+    <p>Open <code>index.html</code> in a text editor, find the <code>FIREBASE_CONFIG</code> block near the top of the &lt;script&gt; section, and paste in your Firebase project credentials.</p>
   </div>
 
   <div class="card" id="form-container">
@@ -346,7 +346,7 @@
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px;">
       <div>
         <h1>Feedback Dashboard</h1>
-        <p class="subtitle" style="margin-top:4px;">Live data from Google Sheets</p>
+        <p class="subtitle" style="margin-top:4px;">Live data from Firebase</p>
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
         <button class="btn btn-secondary btn-sm" onclick="loadDashboard()">🔄 Refresh</button>
@@ -368,13 +368,8 @@
     <!-- Settings -->
     <div class="card" style="margin-top:32px;">
       <h2>⚙️ Settings</h2>
-      <div class="form-group">
-        <label>Apps Script URL</label>
-        <div style="display:flex;gap:10px;">
-          <input type="text" id="admin-script-url" placeholder="https://script.google.com/macros/s/.../exec" style="flex:1;" />
-          <button class="btn btn-primary btn-sm" onclick="saveScriptUrlFromAdmin()">Save</button>
-        </div>
-      </div>
+      <p style="font-size:.875rem;color:var(--muted);margin-bottom:12px;">Firebase project: <strong id="firebase-project-id"></strong></p>
+      <p style="font-size:.8rem;color:var(--muted);">To change the Firebase project, edit the <code style="background:#F3F4F6;padding:1px 5px;border-radius:3px;">FIREBASE_CONFIG</code> object directly in <code style="background:#F3F4F6;padding:1px 5px;border-radius:3px;">index.html</code>.</p>
     </div>
   </div>
 </div>
@@ -383,11 +378,24 @@
 <div id="toast"></div>
 
 <script>
-// ─── CONFIG ────────────────────────────────────────────────────
-const SCRIPT_URL_KEY = 'fb_portal_script_url';
-const AUTH_KEY       = 'fb_portal_admin_auth';
-const ADMIN_PWD      = 'Wynl590718$'; // Must match ADMIN_PWD in apps-script.gs
+// ─── FIREBASE CONFIG ───────────────────────────────────────────
+// Replace these placeholder values with your Firebase project credentials.
+// Get them from: Firebase Console → Project Settings → Your apps → Config
+const FIREBASE_CONFIG = {
+  apiKey:            "AIzaSyDFIMh7YeKiHznHnHgrSCyLhvbx1RSrC3k",
+  authDomain:        "fy26-valuations-feedback.firebaseapp.com",
+  projectId:         "fy26-valuations-feedback",
+  storageBucket:     "fy26-valuations-feedback.firebasestorage.app",
+  messagingSenderId: "1036809893560",
+  appId:             "1:1036809893560:web:f241b858e0948cfd36e64d",
+  measurementId:     "G-RJN9V1EM0W"
+};
 
+// ─── ADMIN PASSWORD ────────────────────────────────────────────
+const ADMIN_PWD = 'Wynl590718$';
+const AUTH_KEY  = 'fb_portal_admin_auth';
+
+// ─── TEAMS & TAGS ──────────────────────────────────────────────
 const TEAMS = [
   "Valuations team","KPMG team","Deloitte team","OLX team","iFood team",
   "JET team","Despegar team","eMAG team","PayU team","TAL team",
@@ -397,14 +405,26 @@ const TEAMS = [
 ];
 
 const TAGS = [
-  "Communication","Collaboration","Delivery","Leadership",
-  "Technical Skills","Responsiveness","Strategic Thinking","Data Quality"
+  "Communication & Collaboration","Data Quality","Delivery","Leadership",
+  "Process Improvement","Stakeholder Management","Technical Knowledge","Other"
 ];
 
-let allData = [];
+let db       = null;
+let allData  = [];
 
 // ─── INIT ──────────────────────────────────────────────────────
 function init() {
+  // Check if Firebase config has been filled in
+  const configured = FIREBASE_CONFIG.apiKey !== 'YOUR_API_KEY';
+
+  if (!configured) {
+    document.getElementById('setup-banner').style.display = 'block';
+  } else {
+    firebase.initializeApp(FIREBASE_CONFIG);
+    db = firebase.firestore();
+    document.getElementById('firebase-project-id').textContent = FIREBASE_CONFIG.projectId;
+  }
+
   // Populate team dropdowns
   ['from-team','to-team'].forEach(id => {
     const el = document.getElementById(id);
@@ -413,6 +433,7 @@ function init() {
       o.value = t; o.textContent = t; el.appendChild(o);
     });
   });
+
   // Populate filter dropdowns
   ['filter-to-team','filter-from-team'].forEach(id => {
     const el = document.getElementById(id);
@@ -421,6 +442,7 @@ function init() {
       o.value = t; o.textContent = t; el.appendChild(o);
     });
   });
+
   // Tags (admin filter)
   const ft = document.getElementById('filter-tag');
   TAGS.forEach(t => {
@@ -433,13 +455,6 @@ function init() {
 
   // Share URL
   document.getElementById('share-url').value = window.location.href;
-
-  // Script URL banner
-  const url = getScriptUrl();
-  if (url) {
-    document.getElementById('setup-banner').style.display = 'none';
-    document.getElementById('script-url-input').value = url;
-  }
 }
 
 // ─── TAG PILLS PER ENTRY ──────────────────────────────────────
@@ -457,24 +472,6 @@ function getSelectedTags(entry) {
   return [...entry.querySelectorAll('.entry-tags .tag.selected')].map(t => t.textContent);
 }
 
-// ─── SCRIPT URL ────────────────────────────────────────────────
-function getScriptUrl() {
-  return localStorage.getItem(SCRIPT_URL_KEY) || '';
-}
-function saveScriptUrl() {
-  const url = document.getElementById('script-url-input').value.trim();
-  if (!url.startsWith('https://script.google.com')) return showToast('Please enter a valid Apps Script URL.', 'error');
-  localStorage.setItem(SCRIPT_URL_KEY, url);
-  document.getElementById('setup-banner').style.display = 'none';
-  showToast('Connected to Google Sheets!', 'success');
-}
-function saveScriptUrlFromAdmin() {
-  const url = document.getElementById('admin-script-url').value.trim();
-  if (!url.startsWith('https://script.google.com')) return showToast('Invalid URL.', 'error');
-  localStorage.setItem(SCRIPT_URL_KEY, url);
-  showToast('URL saved!', 'success');
-}
-
 // ─── NAV ───────────────────────────────────────────────────────
 function showPage(id, btn) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -484,7 +481,7 @@ function showPage(id, btn) {
 
   if (id === 'admin-wrapper') {
     const loggedIn = sessionStorage.getItem(AUTH_KEY) === 'true';
-    document.getElementById('admin-login').style.display    = loggedIn ? 'none' : 'block';
+    document.getElementById('admin-login').style.display     = loggedIn ? 'none' : 'block';
     document.getElementById('admin-dashboard').style.display = loggedIn ? 'block' : 'none';
     if (loggedIn) loadDashboard();
   }
@@ -498,60 +495,57 @@ function selectPill(name, value, el) {
   if (name === 'to-type')   document.getElementById('to-name-group').style.display   = value === 'individual' ? 'block' : 'none';
 }
 
-// ─── SUBMIT ────────────────────────────────────────────────────
+// ─── SUBMIT → FIRESTORE ────────────────────────────────────────
 async function submitFeedback() {
-  const scriptUrl = getScriptUrl();
-  if (!scriptUrl) return showToast('Please connect to Google Sheets first (see yellow banner).', 'error');
+  if (!db) return showToast('Firebase is not configured. See the yellow banner.', 'error');
 
-  const fromTeam  = document.getElementById('from-team').value;
-  const fromType  = document.querySelector('[name="from-type"]:checked')?.value || 'team';
-  const fromName  = document.getElementById('from-name').value.trim();
-  const toTeam    = document.getElementById('to-team').value;
-  const toType    = document.querySelector('[name="to-type"]:checked')?.value || 'team';
-  const toName    = document.getElementById('to-name').value.trim();
+  const fromTeam = document.getElementById('from-team').value;
+  const fromType = document.querySelector('[name="from-type"]:checked')?.value || 'team';
+  const fromName = document.getElementById('from-name').value.trim();
+  const toTeam   = document.getElementById('to-team').value;
+  const toType   = document.querySelector('[name="to-type"]:checked')?.value || 'team';
+  const toName   = document.getElementById('to-name').value.trim();
 
-  // Collect guided entries
   const strengthsEntries = collectEntries('strengths');
   const improveEntries   = collectEntries('improve');
   const otherEntries     = collectEntries('other');
 
-  if (!fromTeam)                               return showToast('Please select your team.', 'error');
-  if (fromType === 'individual' && !fromName)  return showToast('Please enter your name.', 'error');
-  if (!toTeam)                                 return showToast('Please select the team you are giving feedback to.', 'error');
-  if (toType === 'individual' && !toName)      return showToast("Please enter the individual's name.", 'error');
+  if (!fromTeam)                              return showToast('Please select your team.', 'error');
+  if (fromType === 'individual' && !fromName) return showToast('Please enter your name.', 'error');
+  if (!toTeam)                                return showToast('Please select the team you are giving feedback to.', 'error');
+  if (toType === 'individual' && !toName)     return showToast("Please enter the individual's name.", 'error');
 
   const formatEntries = entries => entries.map((e, i) =>
     `[${i+1}] ${e.what}${e.context ? '\nContext: '+e.context : ''}${e.tags.length ? '\nCategories: '+e.tags.join(', ') : ''}`
   ).join('\n\n');
 
+  const allTags = [...new Set([
+    ...strengthsEntries.flatMap(e => e.tags),
+    ...improveEntries.flatMap(e => e.tags),
+    ...otherEntries.flatMap(e => e.tags)
+  ])];
+
   const payload = {
-    fromTeam, fromType, fromLabel: fromType === 'individual' ? fromName : fromTeam,
-    toTeam,   toType,   toLabel:   toType   === 'individual' ? toName   : toTeam,
-    tags: [...new Set([
-      ...strengthsEntries.flatMap(e => e.tags),
-      ...improveEntries.flatMap(e => e.tags),
-      ...otherEntries.flatMap(e => e.tags)
-    ])],
-    strengths: formatEntries(strengthsEntries),
-    improve:   formatEntries(improveEntries),
-    comments:  formatEntries(otherEntries)
+    'From Team':       fromTeam,
+    'From Type':       fromType,
+    'From Label':      fromType === 'individual' ? fromName : fromTeam,
+    'To Team':         toTeam,
+    'To Type':         toType,
+    'To Label':        toType === 'individual' ? toName : toTeam,
+    'Categories':      allTags.join(', '),
+    'Strengths':       formatEntries(strengthsEntries),
+    'Areas to Improve': formatEntries(improveEntries),
+    'Comments':        formatEntries(otherEntries),
+    'Timestamp':       new Date().toISOString()
   };
 
   const btn = document.getElementById('submit-btn');
   btn.disabled = true; btn.textContent = 'Submitting…';
 
   try {
-    const res = await fetch(scriptUrl, {
-      method: 'POST',
-      body: JSON.stringify(payload)
-    });
-    const json = await res.json();
-    if (json.ok) {
-      document.getElementById('form-container').style.display   = 'none';
-      document.getElementById('success-container').style.display = 'block';
-    } else {
-      throw new Error(json.error || 'Unknown error');
-    }
+    await db.collection('feedback').add(payload);
+    document.getElementById('form-container').style.display    = 'none';
+    document.getElementById('success-container').style.display = 'block';
   } catch (err) {
     showToast('Submission failed: ' + err.message, 'error');
   } finally {
@@ -560,16 +554,13 @@ async function submitFeedback() {
 }
 
 function resetForm() {
-  document.getElementById('form-container').style.display   = 'block';
+  document.getElementById('form-container').style.display    = 'block';
   document.getElementById('success-container').style.display = 'none';
   ['from-team','to-team'].forEach(id => document.getElementById(id).value = '');
-  ['from-name','to-name','comments'].forEach(id => document.getElementById(id).value = '');
+  ['from-name','to-name'].forEach(id => document.getElementById(id).value = '');
   ['from-name-group','to-name-group'].forEach(id => document.getElementById(id).style.display = 'none');
   document.querySelectorAll('.radio-pill').forEach(p => p.classList.remove('selected'));
   document.querySelectorAll('.radio-pill:first-of-type').forEach(p => p.classList.add('selected'));
-  selectedTags.clear();
-  document.querySelectorAll('#tags-container .tag').forEach(t => t.classList.remove('selected'));
-  // Reset guided entries — keep only first, clear values and tag selections
   ['strengths','improve','other'].forEach(section => {
     const list = document.getElementById(section + '-list');
     [...list.querySelectorAll('.guided-entry')].forEach((e, i) => { if (i > 0) e.remove(); });
@@ -585,13 +576,11 @@ function addEntry(section) {
   const isStr = section === 'strengths';
   const isOth = section === 'other';
 
-  const whatLabel = isStr ? 'What did they do well?' : isOth ? 'Your comment' : 'What could be improved?';
-  const whatPH    = isStr ? 'e.g. Strong analytical thinking'
-                  : isOth ? 'e.g. Great team to collaborate with…'
-                  : 'e.g. Meeting preparation';
-  const ctxPH     = isStr ? 'e.g. During the budget review they identified a discrepancy no one else noticed…'
-                  : isOth ? 'e.g. Particularly during the year-end close process…'
-                  : 'e.g. Several meetings ran over time because materials were shared late…';
+  const whatLabel  = isStr ? 'What did they do well?' : isOth ? 'Your comment' : 'What could be improved?';
+  const whatPH     = isStr ? 'e.g. Strong analytical thinking' : isOth ? 'e.g. Great team to collaborate with…' : 'e.g. Meeting preparation';
+  const ctxPH      = isStr ? 'e.g. During the budget review they identified a discrepancy no one else noticed…'
+                   : isOth ? 'e.g. Particularly during the year-end close process…'
+                   : 'e.g. Several meetings ran over time because materials were shared late…';
   const ctxOptional = isOth ? ' <span style="font-style:italic;">(optional)</span>' : '';
 
   const div = document.createElement('div');
@@ -619,9 +608,8 @@ function addEntry(section) {
 }
 
 function collectEntries(section) {
-  const list    = document.getElementById(section + '-list');
-  const entries = [...list.querySelectorAll('.guided-entry')];
-  return entries.map(entry => ({
+  const list = document.getElementById(section + '-list');
+  return [...list.querySelectorAll('.guided-entry')].map(entry => ({
     what:    entry.querySelector(`.${section}-what`)?.value.trim()    || '',
     context: entry.querySelector(`.${section}-context`)?.value.trim() || '',
     tags:    getSelectedTags(entry)
@@ -635,8 +623,6 @@ function checkAdminLogin() {
     sessionStorage.setItem(AUTH_KEY, 'true');
     document.getElementById('admin-login').style.display     = 'none';
     document.getElementById('admin-dashboard').style.display = 'block';
-    const url = getScriptUrl();
-    if (url) document.getElementById('admin-script-url').value = url;
     loadDashboard();
   } else {
     document.getElementById('login-error').style.display = 'block';
@@ -649,23 +635,20 @@ function adminLogout() {
   document.getElementById('admin-pwd-input').value = '';
 }
 
-// ─── LOAD DATA ─────────────────────────────────────────────────
+// ─── LOAD DATA FROM FIRESTORE ─────────────────────────────────
 async function loadDashboard() {
-  const scriptUrl = getScriptUrl();
   const listEl = document.getElementById('fb-list');
   listEl.innerHTML = `<div class="loading"><div class="spinner"></div>Loading submissions…</div>`;
   document.getElementById('stats-row').innerHTML = '';
 
-  if (!scriptUrl) {
-    listEl.innerHTML = `<div class="empty-state"><div class="empty-icon">⚙️</div><p>Please configure the Apps Script URL in Settings below.</p></div>`;
+  if (!db) {
+    listEl.innerHTML = `<div class="empty-state"><div class="empty-icon">⚙️</div><p>Firebase is not configured. Edit the FIREBASE_CONFIG in index.html.</p></div>`;
     return;
   }
 
   try {
-    const res  = await fetch(`${scriptUrl}?action=getData&pwd=${encodeURIComponent(ADMIN_PWD)}`);
-    const json = await res.json();
-    if (!json.ok) throw new Error(json.error || 'Failed to load data');
-    allData = json.data || [];
+    const snapshot = await db.collection('feedback').orderBy('Timestamp', 'desc').get();
+    allData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
     renderDashboard();
   } catch (err) {
     listEl.innerHTML = `<div class="empty-state"><div class="empty-icon">❌</div><p>Could not load data: ${escHtml(err.message)}</p></div>`;
@@ -681,13 +664,12 @@ function renderDashboard() {
   const filterTag  = document.getElementById('filter-tag').value;
 
   const filtered = allData.filter(e => {
-    if (filterTo   && e['To Team']   !== filterTo)            return false;
-    if (filterFrom && e['From Team'] !== filterFrom)          return false;
-    if (filterTag  && !(e['Categories']||'').includes(filterTag)) return false;
+    if (filterTo   && e['To Team']   !== filterTo)                  return false;
+    if (filterFrom && e['From Team'] !== filterFrom)                return false;
+    if (filterTag  && !(e['Categories']||'').includes(filterTag))   return false;
     return true;
   });
 
-  // Stats
   const teamsWithFeedback = new Set(allData.map(e => e['To Team'])).size;
   document.getElementById('stats-row').innerHTML = `
     <div class="stat-card"><div class="stat-num">${allData.length}</div><div class="stat-label">Total Submissions</div></div>
@@ -701,16 +683,22 @@ function renderDashboard() {
     return;
   }
 
+  // Format timestamp nicely
+  const fmtDate = iso => {
+    try { return new Date(iso).toLocaleString('en-GB', { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' }); }
+    catch { return iso; }
+  };
+
   listEl.innerHTML = filtered.map(e => {
-    const cats  = (e['Categories']||'').split(',').map(t=>t.trim()).filter(Boolean);
-    const tags  = cats.map(t => `<span class="badge badge-tag">${escHtml(t)}</span>`).join('');
+    const cats = (e['Categories']||'').split(',').map(t=>t.trim()).filter(Boolean);
+    const tags = cats.map(t => `<span class="badge badge-tag">${escHtml(t)}</span>`).join('');
     return `
       <div class="fb-card">
         <div class="fb-meta">
           <span class="badge badge-from">From: ${escHtml(e['From Label'])}</span>
           <span class="badge badge-to">To: ${escHtml(e['To Label'])}</span>
           ${tags}
-          <span class="fb-date">${escHtml(e['Timestamp']||'')}</span>
+          <span class="fb-date">${escHtml(fmtDate(e['Timestamp']))}</span>
         </div>
         ${e['Strengths'] ? `<div class="fb-section"><div class="fb-section-label">✅ Strengths</div><div class="fb-section-value">${escHtml(e['Strengths'])}</div></div>` : ''}
         ${e['Areas to Improve'] ? `<div class="fb-section"><div class="fb-section-label">🔧 Areas to Improve</div><div class="fb-section-value">${escHtml(e['Areas to Improve'])}</div></div>` : ''}
@@ -722,7 +710,7 @@ function renderDashboard() {
 // ─── CSV EXPORT ────────────────────────────────────────────────
 function exportCSV() {
   if (!allData.length) return showToast('No data to export.', 'error');
-  const headers = Object.keys(allData[0]);
+  const headers = ['From Team','From Type','From Label','To Team','To Type','To Label','Categories','Strengths','Areas to Improve','Comments','Timestamp'];
   const rows    = allData.map(e => headers.map(h => `"${String(e[h]||'').replace(/"/g,'""')}"`).join(','));
   const csv     = [headers.map(h=>`"${h}"`).join(','), ...rows].join('\n');
   const a       = document.createElement('a');
