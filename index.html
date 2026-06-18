@@ -1076,6 +1076,71 @@ function renderDashboard() {
           ${tags}
           <span class="fb-date">${escHtml(fmtDate(e['Timestamp']))}</span>
         </div>
+        ${e['Strengths']        ? `<div class="fb-section"><div class="fb-section-label">&#x2705; Strengths</div><div class="fb-section-value">${escHtml(e['Strengths'])}</div></div>` : ''}
+        ${e['Areas to Improve'] ? `<div class="fb-section"><div class="fb-section-label">&#x1F527; Areas to Improve</div><div class="fb-section-value">${escHtml(e['Areas to Improve'])}</div></div>` : ''}
+        ${e['Comments']         ? `<div class="fb-section"><div class="fb-section-label">&#x1F4AC; Comments</div><div class="fb-section-value">${escHtml(e['Comments'])}</div></div>` : ''}
+      </div>`;
+  }).join('');
+}
+
+// CSV EXPORT
+function exportCSV() {
+  if (!allData.length) return showToast('No data to export.', 'error');
+  const headers = ['From Team','From Type','From Label','To Team','To Type','To Label','Categories','Strengths','Areas to Improve','Comments','Timestamp'];
+  const rows    = allData.map(e => headers.map(h => `"${String(e[h]||'').replace(/"/g,'""')}"`).join(','));
+  const csv     = [headers.map(h=>`"${h}"`).join(','), ...rows].join('\n');
+  const a       = document.createElement('a');
+  a.href        = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
+  a.download    = `feedback_export_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+}
+
+// HELPERS
+function copyLink() {
+  navigator.clipboard.writeText(document.getElementById('share-url').value)
+    .then(() => showToast('Link copied!', 'success'))
+    .catch(() => showToast('Please copy manually.', 'error'));
+}
+
+function showToast(msg, type) {
+  type = type || '';
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = type;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+function escHtml(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+init();
+</script>
+</body>
+</html>
+d('toast');
+  t.textContent = msg; t.className = type;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+function escHtml(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+init();
+</script>
+</body>
+</html>
+    const tags = cats.map(t => `<span class="badge badge-tag">${escHtml(t)}</span>`).join('');
+    return `
+      <div class="fb-card">
+        <div class="fb-meta">
+          <span class="badge badge-from">From: ${escHtml(e['From Label'])}</span>
+          <span class="badge badge-to">To: ${escHtml(e['To Label'])}</span>
+          ${tags}
+          <span class="fb-date">${escHtml(fmtDate(e['Timestamp']))}</span>
+        </div>
         ${e['Strengths']        ? `<div class="fb-section"><div class="fb-section-label">✅ Strengths</div><div class="fb-section-value">${escHtml(e['Strengths'])}</div></div>` : ''}
         ${e['Areas to Improve'] ? `<div class="fb-section"><div class="fb-section-label">🔧 Areas to Improve</div><div class="fb-section-value">${escHtml(e['Areas to Improve'])}</div></div>` : ''}
         ${e['Comments']         ? `<div class="fb-section"><div class="fb-section-label">💬 Comments</div><div class="fb-section-value">${escHtml(e['Comments'])}</div></div>` : ''}
