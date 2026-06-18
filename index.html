@@ -570,7 +570,10 @@
       <h2>Admin Access</h2>
       <p>Enter the admin password to view all submissions.</p>
       <div class="form-group">
-        <input type="password" id="admin-pwd-input" placeholder="Password" onkeydown="if(event.key==='Enter')checkAdminLogin()" />
+        <div style="position:relative;">
+          <input type="password" id="admin-pwd-input" placeholder="Password" onkeydown="if(event.key==='Enter')checkAdminLogin()" style="padding-right:42px;" />
+          <button type="button" onclick="togglePwdVisibility()" id="pwd-eye" title="Show/hide password" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--muted);font-size:1.1rem;line-height:1;padding:2px;">👁</button>
+        </div>
       </div>
       <button class="btn btn-primary" style="width:100%;" onclick="checkAdminLogin()">Sign In</button>
       <p id="login-error" style="color:var(--danger);font-size:.8rem;margin-top:10px;display:none;">Incorrect password.</p>
@@ -619,7 +622,7 @@ const FIREBASE_CONFIG = {
 };
 
 // ─── ADMIN PASSWORD ────────────────────────────────────────────
-const ADMIN_PWD = 'ilovevaluations!';
+const ADMIN_PWD = 'ilovevals!';
 const AUTH_KEY  = 'fb_portal_admin_auth';
 
 // ─── TEAMS & TAGS ──────────────────────────────────────────────
@@ -999,6 +1002,18 @@ function collectEntries(section) {
 }
 
 // ─── ADMIN AUTH ────────────────────────────────────────────────
+function togglePwdVisibility() {
+  const input = document.getElementById('admin-pwd-input');
+  const btn   = document.getElementById('pwd-eye');
+  if (input.type === 'password') {
+    input.type = 'text';
+    btn.textContent = '🙈';
+  } else {
+    input.type = 'password';
+    btn.textContent = '👁';
+  }
+}
+
 function checkAdminLogin() {
   const pwd = document.getElementById('admin-pwd-input').value;
   if (pwd === ADMIN_PWD) {
