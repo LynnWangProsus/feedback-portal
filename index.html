@@ -234,7 +234,7 @@
             <textarea class="strengths-what" placeholder="e.g. Clear and proactive communication on complex topics" style="min-height:70px;"></textarea>
           </div>
           <div class="form-group" style="margin-bottom:8px;">
-            <label style="font-weight:400;color:var(--muted);">Describe the circumstances or give a specific example</label>
+            <label style="font-weight:400;color:var(--muted);">Describe the circumstances or give a specific example <span style="font-style:italic;">(optional)</span></label>
             <textarea class="strengths-context" placeholder="e.g. When we needed urgent support during year-end close, they responded quickly and resolved the issue without escalation…" style="min-height:70px;"></textarea>
           </div>
           <div class="form-group" style="margin-bottom:0;">
@@ -259,7 +259,7 @@
             <textarea class="improve-what" placeholder="e.g. Clarity of outputs shared with other teams" style="min-height:70px;"></textarea>
           </div>
           <div class="form-group" style="margin-bottom:8px;">
-            <label style="font-weight:400;color:var(--muted);">Describe the circumstances or give a specific example</label>
+            <label style="font-weight:400;color:var(--muted);">Describe the circumstances or give a specific example <span style="font-style:italic;">(optional)</span></label>
             <textarea class="improve-context" placeholder="e.g. When deadlines changed, our team was often informed at short notice…" style="min-height:70px;"></textarea>
           </div>
           <div class="form-group" style="margin-bottom:0;">
@@ -581,7 +581,7 @@ function addEntry(section) {
   const ctxPH      = isStr ? 'e.g. During the budget review they identified a discrepancy no one else noticed…'
                    : isOth ? 'e.g. Particularly during the year-end close process…'
                    : 'e.g. Several meetings ran over time because materials were shared late…';
-  const ctxOptional = isOth ? ' <span style="font-style:italic;">(optional)</span>' : '';
+  const ctxOptional = ' <span style="font-style:italic;">(optional)</span>';
 
   const div = document.createElement('div');
   div.className = 'guided-entry';
