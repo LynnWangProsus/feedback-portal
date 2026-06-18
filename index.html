@@ -39,16 +39,86 @@
     h2 { font-size: 1.1rem; font-weight: 600; margin-bottom: 16px; color: var(--primary); }
     .subtitle { color: var(--muted); font-size: .9rem; }
 
-    /* ── FORM ── */
+    /* ── WIZARD PROGRESS BAR ── */
+    .wizard-progress {
+      display: flex; align-items: center;
+      margin-bottom: 28px; padding-bottom: 24px;
+      border-bottom: 1px solid var(--border);
+    }
+    .wp-step {
+      display: flex; flex-direction: column; align-items: center; gap: 6px;
+      flex: 1; position: relative;
+    }
+    .wp-step:not(:last-child)::after {
+      content: ''; position: absolute;
+      top: 15px; left: calc(50% + 16px); right: calc(-50% + 16px);
+      height: 2px; background: var(--border); transition: background .4s;
+    }
+    .wp-step.done:not(:last-child)::after { background: var(--accent); }
+    .wp-circle {
+      width: 30px; height: 30px; border-radius: 50%;
+      border: 2px solid var(--border); background: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .8rem; font-weight: 700; color: var(--muted);
+      transition: all .3s; z-index: 1;
+    }
+    .wp-label {
+      font-size: .7rem; font-weight: 600; color: var(--muted);
+      text-align: center; white-space: nowrap; transition: color .3s;
+    }
+    .wp-step.active .wp-circle { background: var(--primary); border-color: var(--primary); color: #fff; box-shadow: 0 0 0 4px rgba(79,70,229,.15); }
+    .wp-step.active .wp-label { color: var(--primary); font-weight: 700; }
+    .wp-step.done .wp-circle { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .wp-step.done .wp-label { color: var(--accent); }
+
+    /* ── STEP PANELS ── */
+    .step-panel { display: none; animation: fadeIn .25s ease; }
+    .step-panel.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+    .step-heading {
+      display: flex; align-items: center; gap: 12px; margin-bottom: 20px;
+    }
+    .step-icon {
+      width: 44px; height: 44px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem; flex-shrink: 0;
+    }
+    .step-icon.blue { background: var(--primary-light); }
+    .step-icon.green { background: #D1FAE5; }
+    .step-icon.amber { background: #FEF3C7; }
+    .step-icon.gray { background: #F3F4F6; }
+    .step-title { font-size: 1.2rem; font-weight: 700; }
+    .step-subtitle { font-size: .85rem; color: var(--muted); margin-top: 2px; }
+
+    /* ── STEP NAV ── */
+    .step-nav {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--border);
+    }
+    .step-counter { font-size: .8rem; color: var(--muted); font-weight: 500; }
+
+    /* ── SUMMARY BAR ── */
+    #summary-bar {
+      background: var(--primary-light); border: 1px solid #C7D2FE;
+      border-radius: 8px; padding: 10px 16px;
+      font-size: .875rem; color: var(--primary); font-weight: 500;
+      display: none; align-items: center; gap: 8px; margin-bottom: 20px;
+    }
+    #summary-bar.visible { display: flex; }
+
+    /* ── FORM ELEMENTS ── */
     .form-group { margin-bottom: 20px; }
     label { display: block; font-weight: 500; font-size: .875rem; margin-bottom: 6px; }
     label .req { color: var(--danger); margin-left: 2px; }
     select, input[type="text"], input[type="password"], textarea {
       width: 100%; padding: 9px 12px; border: 1px solid var(--border); border-radius: 7px;
-      font-size: .9rem; color: var(--text); background: #fff; transition: border-color .2s, box-shadow .2s; font-family: inherit;
+      font-size: .9rem; color: var(--text); background: #fff;
+      transition: border-color .2s, box-shadow .2s; font-family: inherit;
     }
     select:focus, input:focus, textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(79,70,229,.12); }
     textarea { resize: vertical; min-height: 90px; }
+    .helper-text { font-size: .78rem; color: var(--muted); margin-top: 5px; font-style: italic; }
 
     .radio-group { display: flex; gap: 12px; margin-top: 4px; flex-wrap: wrap; }
     .radio-pill { display: flex; align-items: center; gap: 6px; padding: 7px 14px; border: 1px solid var(--border); border-radius: 20px; cursor: pointer; font-size: .875rem; transition: all .2s; user-select: none; }
@@ -56,24 +126,84 @@
     .radio-pill:hover { border-color: var(--primary); background: var(--primary-light); }
     .radio-pill.selected { border-color: var(--primary); background: var(--primary-light); color: var(--primary); font-weight: 600; }
 
+    .divider { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
+    .section-label { font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .8px; color: var(--muted); margin-bottom: 14px; }
+
+    /* ── TAGS ── */
     .tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
     .tag { padding: 6px 14px; border: 1px solid var(--border); border-radius: 20px; cursor: pointer; font-size: .8rem; transition: all .2s; user-select: none; }
     .tag:hover { border-color: var(--primary); background: var(--primary-light); }
     .tag.selected { border-color: var(--primary); background: var(--primary); color: #fff; }
 
-    .divider { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
-    .section-label { font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .8px; color: var(--muted); margin-bottom: 14px; }
+    /* ── CUSTOM CATEGORY INPUT ── */
+    .custom-cat-wrap { display: none; margin-top: 8px; }
+    .custom-cat-wrap.visible { display: block; }
+    .custom-cat-wrap input {
+      width: 100%; padding: 7px 12px; border: 1px solid var(--primary);
+      border-radius: 7px; font-size: .85rem; font-family: inherit;
+      background: var(--primary-light); color: var(--text);
+    }
+    .custom-cat-wrap input:focus { outline: none; box-shadow: 0 0 0 3px rgba(79,70,229,.12); }
+
+    /* ── GUIDED ENTRY ── */
+    .guided-entry { background: #F9FAFB; border: 1px solid var(--border); border-radius: 8px; padding: 16px; }
+
+    /* ── SECTION CONTROLS (skip / collapse) ── */
+    .section-controls {
+      display: flex; align-items: center; justify-content: flex-end;
+      gap: 12px; margin-bottom: 12px;
+    }
+    .skip-link {
+      font-size: .78rem; color: var(--muted); cursor: pointer;
+      background: none; border: none; padding: 0;
+      text-decoration: underline; text-decoration-style: dotted;
+      transition: color .2s; font-family: inherit;
+    }
+    .skip-link:hover { color: var(--primary); }
+    .toggle-btn {
+      background: none; border: none; cursor: pointer;
+      color: var(--muted); font-size: 1rem; padding: 2px 4px;
+      transition: transform .25s, color .2s; line-height: 1;
+    }
+    .toggle-btn:hover { color: var(--primary); }
+    .toggle-btn.collapsed { transform: rotate(-90deg); }
+
+    .section-body { overflow: hidden; transition: max-height .3s ease, opacity .3s ease; max-height: 2000px; opacity: 1; }
+    .section-body.collapsed { max-height: 0; opacity: 0; pointer-events: none; }
+
+    .skipped-notice { display: none; font-size: .8rem; color: var(--muted); padding: 8px 0 4px; font-style: italic; }
+    .skipped-notice.visible { display: flex; align-items: center; gap: 8px; }
+    .undo-skip { background: none; border: none; color: var(--primary); cursor: pointer; font-size: .78rem; text-decoration: underline; font-family: inherit; }
+
+    /* ── COMPLETION BADGE ── */
+    .completion-badge {
+      display: none; background: #D1FAE5; color: #065F46;
+      font-size: .7rem; font-weight: 700; padding: 2px 8px;
+      border-radius: 20px; margin-left: 8px;
+    }
+    .completion-badge.visible { display: inline-flex; align-items: center; gap: 3px; }
+
+    /* ── ADD ANOTHER BUTTON ── */
+    .btn-add {
+      width: 100%; margin-top: 12px;
+      background: #fff; border: 2px dashed var(--border);
+      color: var(--muted); border-radius: 8px;
+      padding: 11px 16px; font-size: .875rem; cursor: pointer;
+      transition: all .2s; display: flex; align-items: center;
+      justify-content: center; gap: 7px; font-weight: 600;
+      font-family: inherit;
+    }
+    .btn-add:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-light); }
 
     /* ── BUTTONS ── */
-    .btn { padding: 11px 28px; border-radius: 8px; font-size: .9rem; font-weight: 600; cursor: pointer; border: none; transition: all .2s; }
+    .btn { padding: 11px 28px; border-radius: 8px; font-size: .9rem; font-weight: 600; cursor: pointer; border: none; transition: all .2s; font-family: inherit; }
     .btn-primary { background: var(--primary); color: #fff; }
     .btn-primary:hover { background: var(--primary-dark); }
     .btn-primary:disabled { background: #a5b4fc; cursor: not-allowed; }
     .btn-secondary { background: var(--border); color: var(--text); }
     .btn-secondary:hover { background: #d1d5db; }
-    .btn-danger { background: var(--danger); color: #fff; }
-    .btn-danger:hover { background: #dc2626; }
-    .btn-sm { padding: 6px 14px; font-size: .8rem; }
+    .btn-ghost { background: none; border: 1px solid var(--border); color: var(--muted); padding: 11px 20px; border-radius: 8px; font-size: .9rem; font-weight: 600; cursor: pointer; transition: all .2s; font-family: inherit; }
+    .btn-ghost:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-light); }
 
     /* ── TOAST ── */
     #toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); background: #1F2937; color: #fff; padding: 12px 24px; border-radius: 8px; font-size: .875rem; font-weight: 500; box-shadow: 0 4px 16px rgba(0,0,0,.25); transition: transform .3s ease; z-index: 1000; white-space: nowrap; }
@@ -105,15 +235,12 @@
 
     /* ── ADMIN DASHBOARD ── */
     #admin-dashboard { max-width: 960px; margin: 40px auto; padding: 0 16px 60px; }
-
     .stats-row { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 20px; }
     .stat-card { flex: 1; min-width: 120px; background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 20px; text-align: center; }
     .stat-num { font-size: 1.8rem; font-weight: 700; color: var(--primary); }
     .stat-label { font-size: .75rem; color: var(--muted); margin-top: 2px; }
-
     .filter-bar { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
     .filter-bar select { flex: 1; min-width: 160px; }
-
     .fb-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px 24px; margin-bottom: 14px; }
     .fb-meta { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; align-items: center; }
     .badge { padding: 3px 10px; border-radius: 20px; font-size: .75rem; font-weight: 600; }
@@ -124,18 +251,17 @@
     .fb-section { margin-bottom: 10px; }
     .fb-section-label { font-size: .75rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 4px; }
     .fb-section-value { font-size: .875rem; line-height: 1.5; white-space: pre-wrap; }
-
     .empty-state { text-align: center; padding: 60px 20px; color: var(--muted); }
     .empty-icon { font-size: 2.5rem; margin-bottom: 12px; }
-
     .loading { text-align: center; padding: 40px; color: var(--muted); font-size: .9rem; }
     .spinner { width: 32px; height: 32px; border: 3px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin .8s linear infinite; margin: 0 auto 12px; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    .guided-entry { background: #F9FAFB; border: 1px solid var(--border); border-radius: 8px; padding: 16px; }
-    .feedback-section { margin-bottom: 4px; }
-
-    @media (max-width: 600px) { .card { padding: 20px 16px; } .radio-group { flex-direction: column; } }
+    @media (max-width: 600px) {
+      .card { padding: 20px 16px; }
+      .radio-group { flex-direction: column; }
+      .wp-label { display: none; }
+    }
   </style>
 </head>
 <body>
@@ -157,156 +283,268 @@
 ════════════════════════════════════════════════════════════ -->
 <div id="form-page" class="page active">
 
-  <!-- Setup banner (shown until Firebase is configured) -->
   <div class="setup-banner" id="setup-banner" style="display:none;">
     <strong>⚙️ Firebase not configured</strong>
-    <p>Open <code>index.html</code> in a text editor, find the <code>FIREBASE_CONFIG</code> block near the top of the &lt;script&gt; section, and paste in your Firebase project credentials.</p>
+    <p>Open <code>index.html</code>, find the <code>FIREBASE_CONFIG</code> block and paste in your Firebase project credentials.</p>
   </div>
 
   <div class="card" id="form-container">
-    <h1>Submit Feedback</h1>
-    <p class="subtitle">All submissions are anonymous. Your name is never stored unless you choose to add it.</p>
-    <hr class="divider" />
 
-    <!-- FROM -->
-    <div class="section-label">Feedback From</div>
-    <div class="form-group">
-      <label>Team <span class="req">*</span></label>
-      <select id="from-team">
-        <option value="">— Select your team —</option>
-      </select>
-    </div>
-    <div class="form-group">
-      <label>Submitting as</label>
-      <div class="radio-group">
-        <label class="radio-pill selected" onclick="selectPill('from-type','team',this)">
-          <input type="radio" name="from-type" value="team" checked /> Whole Team
-        </label>
-        <label class="radio-pill" onclick="selectPill('from-type','individual',this)">
-          <input type="radio" name="from-type" value="individual" /> Individual
-        </label>
+    <!-- ── WIZARD PROGRESS ── -->
+    <div class="wizard-progress">
+      <div class="wp-step active" id="wp-1">
+        <div class="wp-circle">1</div>
+        <div class="wp-label">👥 Who?</div>
+      </div>
+      <div class="wp-step" id="wp-2">
+        <div class="wp-circle">2</div>
+        <div class="wp-label">✅ Strengths</div>
+      </div>
+      <div class="wp-step" id="wp-3">
+        <div class="wp-circle">3</div>
+        <div class="wp-label">🔧 Improvements</div>
+      </div>
+      <div class="wp-step" id="wp-4">
+        <div class="wp-circle">4</div>
+        <div class="wp-label">💬 Other</div>
       </div>
     </div>
-    <div class="form-group" id="from-name-group" style="display:none;">
-      <label>Your Name <span class="req">*</span></label>
-      <input type="text" id="from-name" placeholder="Enter your name" />
-    </div>
 
-    <hr class="divider" />
-
-    <!-- TO -->
-    <div class="section-label">Feedback To</div>
-    <div class="form-group">
-      <label>Team <span class="req">*</span></label>
-      <select id="to-team">
-        <option value="">— Select a team —</option>
-      </select>
-    </div>
-    <div class="form-group">
-      <label>Giving feedback to</label>
-      <div class="radio-group">
-        <label class="radio-pill selected" onclick="selectPill('to-type','team',this)">
-          <input type="radio" name="to-type" value="team" checked /> Whole Team
-        </label>
-        <label class="radio-pill" onclick="selectPill('to-type','individual',this)">
-          <input type="radio" name="to-type" value="individual" /> Specific Individual
-        </label>
-      </div>
-    </div>
-    <div class="form-group" id="to-name-group" style="display:none;">
-      <label>Individual's Name <span class="req">*</span></label>
-      <input type="text" id="to-name" placeholder="Enter their name" />
-    </div>
-
-    <hr class="divider" />
-
-    <!-- CONTENT -->
-    <div class="section-label">Your Feedback</div>
-
-    <!-- STRENGTHS -->
-    <div class="feedback-section">
-      <div class="section-label" style="color:var(--accent);margin-bottom:6px;">✅ Strengths</div>
-      <p style="font-size:.8rem;color:var(--muted);margin-bottom:14px;">Share what this team or person does well. You can add multiple observations.</p>
-      <div id="strengths-list">
-        <div class="guided-entry">
-          <div class="form-group" style="margin-bottom:8px;">
-            <label style="font-weight:400;color:var(--muted);">What did they do well?</label>
-            <textarea class="strengths-what" placeholder="e.g. Clear and proactive communication on complex topics" style="min-height:70px;"></textarea>
-          </div>
-          <div class="form-group" style="margin-bottom:8px;">
-            <label style="font-weight:400;color:var(--muted);">Describe the circumstances or give a specific example <span style="font-style:italic;">(optional)</span></label>
-            <textarea class="strengths-context" placeholder="e.g. When we needed urgent support during year-end close, they responded quickly and resolved the issue without escalation…" style="min-height:70px;"></textarea>
-          </div>
-          <div class="form-group" style="margin-bottom:0;">
-            <label style="font-weight:400;color:var(--muted);">Category <span style="font-style:italic;">(optional)</span></label>
-            <div class="tags entry-tags"></div>
-          </div>
+    <!-- ════════════════════════════════
+         STEP 1 — WHO ARE YOU?
+    ════════════════════════════════ -->
+    <div class="step-panel active" id="panel-1">
+      <div class="step-heading">
+        <div class="step-icon blue">👥</div>
+        <div>
+          <div class="step-title">Who are you &amp; who's this for?</div>
+          <div class="step-subtitle">Tell us which team you're from and who you're giving feedback to.</div>
         </div>
       </div>
-      <button type="button" class="btn btn-secondary btn-sm" onclick="addEntry('strengths')" style="margin-top:10px;">+ Add another strength</button>
-    </div>
 
-    <hr class="divider" />
-
-    <!-- AREAS TO IMPROVE -->
-    <div class="feedback-section">
-      <div class="section-label" style="color:#F59E0B;margin-bottom:6px;">🔧 Areas to Improve</div>
-      <p style="font-size:.8rem;color:var(--muted);margin-bottom:14px;">Share constructive observations. Be specific so feedback is actionable.</p>
-      <div id="improve-list">
-        <div class="guided-entry">
-          <div class="form-group" style="margin-bottom:8px;">
-            <label style="font-weight:400;color:var(--muted);">What could be improved?</label>
-            <textarea class="improve-what" placeholder="e.g. Clarity of outputs shared with other teams" style="min-height:70px;"></textarea>
-          </div>
-          <div class="form-group" style="margin-bottom:8px;">
-            <label style="font-weight:400;color:var(--muted);">Describe the circumstances or give a specific example <span style="font-style:italic;">(optional)</span></label>
-            <textarea class="improve-context" placeholder="e.g. When deadlines changed, our team was often informed at short notice…" style="min-height:70px;"></textarea>
-          </div>
-          <div class="form-group" style="margin-bottom:0;">
-            <label style="font-weight:400;color:var(--muted);">Category <span style="font-style:italic;">(optional)</span></label>
-            <div class="tags entry-tags"></div>
-          </div>
+      <div class="section-label">Feedback From</div>
+      <div class="form-group">
+        <label>Your team <span class="req">*</span></label>
+        <input type="text" id="from-team" list="teams-datalist" placeholder="Type or select your team…" autocomplete="off" oninput="updateSummaryBar()" />
+      </div>
+      <div class="form-group">
+        <label>Submitting as</label>
+        <div class="radio-group">
+          <label class="radio-pill selected" onclick="selectPill('from-type','team',this)">
+            <input type="radio" name="from-type" value="team" checked /> Whole Team
+          </label>
+          <label class="radio-pill" onclick="selectPill('from-type','individual',this)">
+            <input type="radio" name="from-type" value="individual" /> Individual
+          </label>
         </div>
       </div>
-      <button type="button" class="btn btn-secondary btn-sm" onclick="addEntry('improve')" style="margin-top:10px;">+ Add another area</button>
-    </div>
+      <div class="form-group" id="from-name-group" style="display:none;">
+        <label>Your name <span class="req">*</span></label>
+        <input type="text" id="from-name" placeholder="Enter your name" />
+      </div>
 
-    <hr class="divider" />
+      <hr class="divider" />
 
-    <!-- OTHER COMMENTS -->
-    <div class="feedback-section">
-      <div class="section-label" style="margin-bottom:6px;">💬 Other Comments</div>
-      <p style="font-size:.8rem;color:var(--muted);margin-bottom:14px;">Anything else you'd like to share — context, suggestions, or general thoughts.</p>
-      <div id="other-list">
-        <div class="guided-entry">
-          <div class="form-group" style="margin-bottom:8px;">
-            <label style="font-weight:400;color:var(--muted);">Your comment</label>
-            <textarea class="other-what" placeholder="e.g. A dependable and collaborative team to work with…" style="min-height:70px;"></textarea>
-          </div>
-          <div class="form-group" style="margin-bottom:8px;">
-            <label style="font-weight:400;color:var(--muted);">Describe the circumstances or give a specific example <span style="font-style:italic;">(optional)</span></label>
-            <textarea class="other-context" placeholder="e.g. Especially evident during the annual reporting cycle…" style="min-height:70px;"></textarea>
-          </div>
-          <div class="form-group" style="margin-bottom:0;">
-            <label style="font-weight:400;color:var(--muted);">Category <span style="font-style:italic;">(optional)</span></label>
-            <div class="tags entry-tags"></div>
-          </div>
+      <div class="section-label">Feedback To</div>
+      <div class="form-group">
+        <label>Recipient team <span class="req">*</span></label>
+        <input type="text" id="to-team" list="teams-datalist" placeholder="Type or select a team…" autocomplete="off" oninput="updateSummaryBar()" />
+        <datalist id="teams-datalist"></datalist>
+      </div>
+      <div class="form-group">
+        <label>Giving feedback to</label>
+        <div class="radio-group">
+          <label class="radio-pill selected" onclick="selectPill('to-type','team',this)">
+            <input type="radio" name="to-type" value="team" checked /> Whole Team
+          </label>
+          <label class="radio-pill" onclick="selectPill('to-type','individual',this)">
+            <input type="radio" name="to-type" value="individual" /> Specific Individual
+          </label>
         </div>
       </div>
-      <button type="button" class="btn btn-secondary btn-sm" onclick="addEntry('other')" style="margin-top:10px;">+ Add another comment</button>
+      <div class="form-group" id="to-name-group" style="display:none;">
+        <label>Individual's name <span class="req">*</span></label>
+        <input type="text" id="to-name" placeholder="Enter their name" />
+      </div>
+
+      <div class="step-nav">
+        <span class="step-counter">Step 1 of 4</span>
+        <button class="btn btn-primary" onclick="goNext()">Next → </button>
+      </div>
     </div>
 
-    <button class="btn btn-primary" id="submit-btn" onclick="submitFeedback()" style="width:100%;margin-top:4px;">
-      Submit Feedback Anonymously
-    </button>
-  </div>
+    <!-- ════════════════════════════════
+         STEP 2 — STRENGTHS
+    ════════════════════════════════ -->
+    <div class="step-panel" id="panel-2">
+      <div id="summary-bar">
+        <span>📝</span><span id="summary-text"></span>
+      </div>
+
+      <div class="step-heading">
+        <div class="step-icon green">✅</div>
+        <div>
+          <div class="step-title">
+            Strengths
+            <span class="completion-badge" id="badge-strengths">✓ Added</span>
+          </div>
+          <div class="step-subtitle">Share what this team or person does well.</div>
+        </div>
+      </div>
+
+      <div class="section-controls">
+        <button class="skip-link" id="skip-btn-strengths" onclick="skipSection('strengths')">Skip this section</button>
+        <button class="toggle-btn" id="toggle-strengths" onclick="toggleSection('strengths')" title="Collapse">▼</button>
+      </div>
+
+      <div class="section-body" id="body-strengths">
+        <div id="strengths-list">
+          <div class="guided-entry">
+            <div class="form-group" style="margin-bottom:8px;">
+              <label style="font-weight:400;color:var(--muted);">What did they do well?</label>
+              <textarea class="strengths-what" placeholder="e.g. Clear and proactive communication on complex topics" style="min-height:70px;"></textarea>
+              <div class="helper-text">Even one sentence is valuable.</div>
+            </div>
+            <div class="form-group" style="margin-bottom:8px;">
+              <label style="font-weight:400;color:var(--muted);">Specific example <span style="font-style:italic;">(optional)</span></label>
+              <textarea class="strengths-context" placeholder="e.g. During year-end close they resolved a critical issue without escalation…" style="min-height:70px;"></textarea>
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label style="font-weight:400;color:var(--muted);">Category <span style="font-style:italic;">(optional)</span></label>
+              <div class="tags entry-tags"></div>
+              <div class="custom-cat-wrap"><input type="text" class="custom-cat-input" placeholder="Describe your custom category…" /></div>
+            </div>
+          </div>
+        </div>
+        <button type="button" class="btn-add" onclick="addEntry('strengths')"><span>＋</span> Add another strength</button>
+      </div>
+      <div class="skipped-notice" id="skip-notice-strengths">
+        <span>Skipped</span><button class="undo-skip" onclick="undoSkip('strengths')">Undo</button>
+      </div>
+
+      <div class="step-nav">
+        <button class="btn-ghost" onclick="goBack()">← Back</button>
+        <span class="step-counter">Step 2 of 4</span>
+        <button class="btn btn-primary" onclick="goNext()">Next →</button>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════
+         STEP 3 — IMPROVEMENTS
+    ════════════════════════════════ -->
+    <div class="step-panel" id="panel-3">
+      <div id="summary-bar-3" class="summary-clone"></div>
+
+      <div class="step-heading">
+        <div class="step-icon amber">🔧</div>
+        <div>
+          <div class="step-title">
+            Areas to Improve
+            <span class="completion-badge" id="badge-improve">✓ Added</span>
+          </div>
+          <div class="step-subtitle">Constructive observations — be specific so feedback is actionable.</div>
+        </div>
+      </div>
+
+      <div class="section-controls">
+        <button class="skip-link" id="skip-btn-improve" onclick="skipSection('improve')">Skip this section</button>
+        <button class="toggle-btn" id="toggle-improve" onclick="toggleSection('improve')" title="Collapse">▼</button>
+      </div>
+
+      <div class="section-body" id="body-improve">
+        <div id="improve-list">
+          <div class="guided-entry">
+            <div class="form-group" style="margin-bottom:8px;">
+              <label style="font-weight:400;color:var(--muted);">What could be improved?</label>
+              <textarea class="improve-what" placeholder="e.g. Clarity of outputs shared with other teams" style="min-height:70px;"></textarea>
+              <div class="helper-text">Optional — skip if nothing comes to mind.</div>
+            </div>
+            <div class="form-group" style="margin-bottom:8px;">
+              <label style="font-weight:400;color:var(--muted);">Specific example <span style="font-style:italic;">(optional)</span></label>
+              <textarea class="improve-context" placeholder="e.g. When deadlines changed, our team was often informed at short notice…" style="min-height:70px;"></textarea>
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label style="font-weight:400;color:var(--muted);">Category <span style="font-style:italic;">(optional)</span></label>
+              <div class="tags entry-tags"></div>
+              <div class="custom-cat-wrap"><input type="text" class="custom-cat-input" placeholder="Describe your custom category…" /></div>
+            </div>
+          </div>
+        </div>
+        <button type="button" class="btn-add" onclick="addEntry('improve')"><span>＋</span> Add another area</button>
+      </div>
+      <div class="skipped-notice" id="skip-notice-improve">
+        <span>Skipped</span><button class="undo-skip" onclick="undoSkip('improve')">Undo</button>
+      </div>
+
+      <div class="step-nav">
+        <button class="btn-ghost" onclick="goBack()">← Back</button>
+        <span class="step-counter">Step 3 of 4</span>
+        <button class="btn btn-primary" onclick="goNext()">Next →</button>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════
+         STEP 4 — OTHER COMMENTS
+    ════════════════════════════════ -->
+    <div class="step-panel" id="panel-4">
+      <div id="summary-bar-4" class="summary-clone"></div>
+
+      <div class="step-heading">
+        <div class="step-icon gray">💬</div>
+        <div>
+          <div class="step-title">
+            Other Comments
+            <span class="completion-badge" id="badge-other">✓ Added</span>
+          </div>
+          <div class="step-subtitle">Anything else — context, suggestions, or general thoughts.</div>
+        </div>
+      </div>
+
+      <div class="section-controls">
+        <button class="skip-link" id="skip-btn-other" onclick="skipSection('other')">Skip this section</button>
+        <button class="toggle-btn" id="toggle-other" onclick="toggleSection('other')" title="Collapse">▼</button>
+      </div>
+
+      <div class="section-body" id="body-other">
+        <div id="other-list">
+          <div class="guided-entry">
+            <div class="form-group" style="margin-bottom:8px;">
+              <label style="font-weight:400;color:var(--muted);">Your comment</label>
+              <textarea class="other-what" placeholder="e.g. A dependable and collaborative team to work with…" style="min-height:70px;"></textarea>
+              <div class="helper-text">Optional — skip if nothing comes to mind.</div>
+            </div>
+            <div class="form-group" style="margin-bottom:8px;">
+              <label style="font-weight:400;color:var(--muted);">Specific example <span style="font-style:italic;">(optional)</span></label>
+              <textarea class="other-context" placeholder="e.g. Especially evident during the annual reporting cycle…" style="min-height:70px;"></textarea>
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label style="font-weight:400;color:var(--muted);">Category <span style="font-style:italic;">(optional)</span></label>
+              <div class="tags entry-tags"></div>
+              <div class="custom-cat-wrap"><input type="text" class="custom-cat-input" placeholder="Describe your custom category…" /></div>
+            </div>
+          </div>
+        </div>
+        <button type="button" class="btn-add" onclick="addEntry('other')"><span>＋</span> Add another comment</button>
+      </div>
+      <div class="skipped-notice" id="skip-notice-other">
+        <span>Skipped</span><button class="undo-skip" onclick="undoSkip('other')">Undo</button>
+      </div>
+
+      <div class="step-nav">
+        <button class="btn-ghost" onclick="goBack()">← Back</button>
+        <span class="step-counter">Step 4 of 4</span>
+        <button class="btn btn-primary" id="submit-btn" onclick="submitFeedback()">Submit Anonymously ✓</button>
+      </div>
+    </div>
+
+  </div><!-- /form-container -->
 
   <!-- Success screen -->
   <div class="card" id="success-container" style="display:none;">
     <div class="success-screen">
       <div class="success-icon">✅</div>
       <h2>Feedback Submitted!</h2>
-      <p>Your response has been saved to the central database. Thank you for sharing.</p>
+      <p>Your response has been saved. Thank you for sharing.</p>
       <button class="btn btn-primary" onclick="resetForm()">Submit Another</button>
     </div>
   </div>
@@ -317,7 +555,7 @@
     <p style="font-size:.875rem;color:var(--muted);">Copy the link below and share with your team members.</p>
     <div class="share-box">
       <input type="text" id="share-url" readonly />
-      <button class="btn btn-primary btn-sm" onclick="copyLink()">Copy</button>
+      <button class="btn btn-primary" style="padding:6px 14px;font-size:.8rem;" onclick="copyLink()">Copy</button>
     </div>
   </div>
 </div>
@@ -326,8 +564,6 @@
      ADMIN WRAPPER
 ════════════════════════════════════════════════════════════ -->
 <div id="admin-wrapper" class="page">
-
-  <!-- Login -->
   <div id="admin-login">
     <div class="card">
       <div style="font-size:2.5rem;margin-bottom:16px;">🔐</div>
@@ -341,7 +577,6 @@
     </div>
   </div>
 
-  <!-- Dashboard -->
   <div id="admin-dashboard" style="display:none;">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px;">
       <div>
@@ -349,38 +584,30 @@
         <p class="subtitle" style="margin-top:4px;">Live data from Firebase</p>
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
-        <button class="btn btn-secondary btn-sm" onclick="loadDashboard()">🔄 Refresh</button>
-        <button class="btn btn-secondary btn-sm" onclick="exportCSV()">⬇ Export CSV</button>
-        <button class="btn btn-secondary btn-sm" onclick="adminLogout()">Sign Out</button>
+        <button class="btn btn-secondary" style="padding:6px 14px;font-size:.8rem;" onclick="loadDashboard()">🔄 Refresh</button>
+        <button class="btn btn-secondary" style="padding:6px 14px;font-size:.8rem;" onclick="exportCSV()">⬇ Export CSV</button>
+        <button class="btn btn-secondary" style="padding:6px 14px;font-size:.8rem;" onclick="adminLogout()">Sign Out</button>
       </div>
     </div>
-
     <div class="stats-row" id="stats-row"></div>
-
     <div class="filter-bar">
       <select id="filter-to-team" onchange="applyFilters()"><option value="">All Teams (To)</option></select>
       <select id="filter-from-team" onchange="applyFilters()"><option value="">All Teams (From)</option></select>
       <select id="filter-tag" onchange="applyFilters()"><option value="">All Categories</option></select>
     </div>
-
     <div id="fb-list"></div>
-
-    <!-- Settings -->
     <div class="card" style="margin-top:32px;">
       <h2>⚙️ Settings</h2>
       <p style="font-size:.875rem;color:var(--muted);margin-bottom:12px;">Firebase project: <strong id="firebase-project-id"></strong></p>
-      <p style="font-size:.8rem;color:var(--muted);">To change the Firebase project, edit the <code style="background:#F3F4F6;padding:1px 5px;border-radius:3px;">FIREBASE_CONFIG</code> object directly in <code style="background:#F3F4F6;padding:1px 5px;border-radius:3px;">index.html</code>.</p>
+      <p style="font-size:.8rem;color:var(--muted);">Edit <code style="background:#F3F4F6;padding:1px 5px;border-radius:3px;">FIREBASE_CONFIG</code> in <code style="background:#F3F4F6;padding:1px 5px;border-radius:3px;">index.html</code> to change the project.</p>
     </div>
   </div>
 </div>
 
-<!-- TOAST -->
 <div id="toast"></div>
 
 <script>
 // ─── FIREBASE CONFIG ───────────────────────────────────────────
-// Replace these placeholder values with your Firebase project credentials.
-// Get them from: Firebase Console → Project Settings → Your apps → Config
 const FIREBASE_CONFIG = {
   apiKey:            "AIzaSyDFIMh7YeKiHznHnHgrSCyLhvbx1RSrC3k",
   authDomain:        "fy26-valuations-feedback.firebaseapp.com",
@@ -397,11 +624,12 @@ const AUTH_KEY  = 'fb_portal_admin_auth';
 
 // ─── TEAMS & TAGS ──────────────────────────────────────────────
 const TEAMS = [
-  "Valuations team","KPMG team","Deloitte team","OLX team","iFood team",
-  "JET team","Despegar team","eMAG team","PayU team","TAL team",
-  "Stack Overflow team","GoodHabitz team","Iyzico team","SFP&A team",
-  "Shares Office team","Shares Estimate team","HR team",
-  "Financial Reporting team","Treasury team","Executive team","CoSec team"
+  "Valuations team",
+  "CoSec team","Deloitte team","Despegar team","eMAG team","Executive team",
+  "Financial Reporting team","GoodHabitz team","HR team","iFood team",
+  "Iyzico team","JET team","KPMG team","OLX team","PayU team",
+  "SFP&A team","Shares Estimate team","Shares Office team",
+  "Stack Overflow team","TAL team","Treasury team"
 ];
 
 const TAGS = [
@@ -409,14 +637,17 @@ const TAGS = [
   "Process Improvement","Stakeholder Management","Technical Knowledge","Other"
 ];
 
-let db       = null;
-let allData  = [];
+let db      = null;
+let allData = [];
+
+// ─── WIZARD STATE ─────────────────────────────────────────────
+let currentStep = 1;
+const TOTAL_STEPS = 4;
+const skipped = { strengths: false, improve: false, other: false };
 
 // ─── INIT ──────────────────────────────────────────────────────
 function init() {
-  // Check if Firebase config has been filled in
   const configured = FIREBASE_CONFIG.apiKey !== 'YOUR_API_KEY';
-
   if (!configured) {
     document.getElementById('setup-banner').style.display = 'block';
   } else {
@@ -425,36 +656,108 @@ function init() {
     document.getElementById('firebase-project-id').textContent = FIREBASE_CONFIG.projectId;
   }
 
-  // Populate team dropdowns
-  ['from-team','to-team'].forEach(id => {
-    const el = document.getElementById(id);
-    TEAMS.forEach(t => {
-      const o = document.createElement('option');
-      o.value = t; o.textContent = t; el.appendChild(o);
-    });
-  });
-
-  // Populate filter dropdowns
+  // Populate shared datalist for team type-ahead inputs
+  const dl = document.getElementById('teams-datalist');
+  TEAMS.forEach(t => { const o = document.createElement('option'); o.value = t; dl.appendChild(o); });
   ['filter-to-team','filter-from-team'].forEach(id => {
     const el = document.getElementById(id);
-    TEAMS.forEach(t => {
-      const o = document.createElement('option');
-      o.value = t; o.textContent = t; el.appendChild(o);
-    });
+    TEAMS.forEach(t => { const o = document.createElement('option'); o.value = t; o.textContent = t; el.appendChild(o); });
   });
-
-  // Tags (admin filter)
   const ft = document.getElementById('filter-tag');
-  TAGS.forEach(t => {
-    const o = document.createElement('option');
-    o.value = t; o.textContent = t; ft.appendChild(o);
-  });
+  TAGS.forEach(t => { const o = document.createElement('option'); o.value = t; o.textContent = t; ft.appendChild(o); });
 
-  // Seed tag pills into all initial guided entries
-  document.querySelectorAll('.entry-tags').forEach(container => seedTags(container));
-
-  // Share URL
+  document.querySelectorAll('.entry-tags').forEach(c => seedTags(c));
+  setupCompletionTracking();
   document.getElementById('share-url').value = window.location.href;
+}
+
+// ─── WIZARD NAVIGATION ─────────────────────────────────────────
+function goNext() {
+  if (currentStep === 1 && !validateStep1()) return;
+  if (currentStep < TOTAL_STEPS) {
+    showStep(currentStep + 1);
+  }
+}
+
+function goBack() {
+  if (currentStep > 1) showStep(currentStep - 1);
+}
+
+function showStep(n) {
+  // Hide current panel
+  document.getElementById('panel-' + currentStep).classList.remove('active');
+
+  currentStep = n;
+
+  // Show new panel
+  const panel = document.getElementById('panel-' + currentStep);
+  panel.classList.add('active');
+
+  // Update wizard progress bar
+  for (let i = 1; i <= TOTAL_STEPS; i++) {
+    const wp = document.getElementById('wp-' + i);
+    wp.classList.remove('active','done');
+    if (i < currentStep) wp.classList.add('done');
+    else if (i === currentStep) wp.classList.add('active');
+  }
+
+  // Sync summary bar clones on steps 3 and 4
+  syncSummaryClones();
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function validateStep1() {
+  const fromTeam = document.getElementById('from-team').value;
+  const fromType = document.querySelector('[name="from-type"]:checked')?.value || 'team';
+  const fromName = document.getElementById('from-name').value.trim();
+  const toTeam   = document.getElementById('to-team').value;
+  const toType   = document.querySelector('[name="to-type"]:checked')?.value || 'team';
+  const toName   = document.getElementById('to-name').value.trim();
+
+  if (!fromTeam)                              { showToast('Please select your team.', 'error'); return false; }
+  if (fromType === 'individual' && !fromName) { showToast('Please enter your name.', 'error'); return false; }
+  if (!toTeam)                                { showToast('Please select the recipient team.', 'error'); return false; }
+  if (toType === 'individual' && !toName)     { showToast("Please enter the individual's name.", 'error'); return false; }
+  return true;
+}
+
+// ─── SUMMARY BAR ──────────────────────────────────────────────
+function updateSummaryBar() {
+  const from = document.getElementById('from-team').value;
+  const to   = document.getElementById('to-team').value;
+  const bar  = document.getElementById('summary-bar');
+  const txt  = document.getElementById('summary-text');
+
+  if (from && to) {
+    txt.textContent = `Giving feedback from ${from} → ${to}`;
+    bar.classList.add('visible');
+  } else if (from) {
+    txt.textContent = `From ${from} → (select a recipient above)`;
+    bar.classList.add('visible');
+  } else {
+    bar.classList.remove('visible');
+  }
+  syncSummaryClones();
+}
+
+function syncSummaryClones() {
+  // Mirror the summary bar content into steps 3 and 4
+  const from = document.getElementById('from-team').value;
+  const to   = document.getElementById('to-team').value;
+  const text = from && to ? `📝 Giving feedback from ${from} → ${to}` : '';
+
+  [3, 4].forEach(step => {
+    const clone = document.getElementById('summary-bar-' + step);
+    if (!clone) return;
+    if (text) {
+      clone.innerHTML = text;
+      clone.style.cssText = 'background:var(--primary-light);border:1px solid #C7D2FE;border-radius:8px;padding:10px 16px;font-size:.875rem;color:var(--primary);font-weight:500;display:flex;align-items:center;gap:8px;margin-bottom:20px;';
+    } else {
+      clone.innerHTML = '';
+      clone.style.display = 'none';
+    }
+  });
 }
 
 // ─── TAG PILLS PER ENTRY ──────────────────────────────────────
@@ -463,13 +766,71 @@ function seedTags(container) {
     const s = document.createElement('span');
     s.className = 'tag';
     s.textContent = tag;
-    s.onclick = () => { s.classList.toggle('selected'); };
+    if (tag === 'Other') {
+      s.onclick = () => {
+        s.classList.toggle('selected');
+        const wrap = container.parentElement.querySelector('.custom-cat-wrap');
+        if (wrap) {
+          wrap.classList.toggle('visible', s.classList.contains('selected'));
+          if (s.classList.contains('selected')) wrap.querySelector('input').focus();
+        }
+      };
+    } else {
+      s.onclick = () => { s.classList.toggle('selected'); };
+    }
     container.appendChild(s);
   });
 }
 
 function getSelectedTags(entry) {
-  return [...entry.querySelectorAll('.entry-tags .tag.selected')].map(t => t.textContent);
+  return [...entry.querySelectorAll('.entry-tags .tag.selected')].map(t => {
+    if (t.textContent === 'Other') {
+      const customInput = entry.querySelector('.custom-cat-input');
+      const val = customInput ? customInput.value.trim() : '';
+      return val || 'Other';
+    }
+    return t.textContent;
+  });
+}
+
+// ─── SECTION TOGGLE / SKIP ────────────────────────────────────
+function toggleSection(section) {
+  const body   = document.getElementById('body-' + section);
+  const toggle = document.getElementById('toggle-' + section);
+  body.classList.toggle('collapsed');
+  toggle.classList.toggle('collapsed');
+  toggle.title = body.classList.contains('collapsed') ? 'Expand' : 'Collapse';
+}
+
+function skipSection(section) {
+  skipped[section] = true;
+  document.getElementById('body-' + section).classList.add('collapsed');
+  document.getElementById('toggle-' + section).classList.add('collapsed');
+  document.getElementById('skip-notice-' + section).classList.add('visible');
+  const skipBtn = document.getElementById('skip-btn-' + section);
+  if (skipBtn) skipBtn.style.display = 'none';
+}
+
+function undoSkip(section) {
+  skipped[section] = false;
+  document.getElementById('body-' + section).classList.remove('collapsed');
+  document.getElementById('toggle-' + section).classList.remove('collapsed');
+  document.getElementById('skip-notice-' + section).classList.remove('visible');
+  const skipBtn = document.getElementById('skip-btn-' + section);
+  if (skipBtn) skipBtn.style.display = '';
+}
+
+// ─── COMPLETION TRACKING ──────────────────────────────────────
+function setupCompletionTracking() {
+  ['strengths','improve','other'].forEach(section => {
+    document.getElementById(section + '-list').addEventListener('input', () => checkCompletion(section));
+  });
+}
+
+function checkCompletion(section) {
+  const list   = document.getElementById(section + '-list');
+  const hasVal = [...list.querySelectorAll('textarea')].some(t => t.value.trim().length > 0);
+  document.getElementById('badge-' + section).classList.toggle('visible', hasVal);
 }
 
 // ─── NAV ───────────────────────────────────────────────────────
@@ -510,11 +871,6 @@ async function submitFeedback() {
   const improveEntries   = collectEntries('improve');
   const otherEntries     = collectEntries('other');
 
-  if (!fromTeam)                              return showToast('Please select your team.', 'error');
-  if (fromType === 'individual' && !fromName) return showToast('Please enter your name.', 'error');
-  if (!toTeam)                                return showToast('Please select the team you are giving feedback to.', 'error');
-  if (toType === 'individual' && !toName)     return showToast("Please enter the individual's name.", 'error');
-
   const formatEntries = entries => entries.map((e, i) =>
     `[${i+1}] ${e.what}${e.context ? '\nContext: '+e.context : ''}${e.tags.length ? '\nCategories: '+e.tags.join(', ') : ''}`
   ).join('\n\n');
@@ -526,17 +882,17 @@ async function submitFeedback() {
   ])];
 
   const payload = {
-    'From Team':       fromTeam,
-    'From Type':       fromType,
-    'From Label':      fromType === 'individual' ? fromName : fromTeam,
-    'To Team':         toTeam,
-    'To Type':         toType,
-    'To Label':        toType === 'individual' ? toName : toTeam,
-    'Categories':      allTags.join(', '),
-    'Strengths':       formatEntries(strengthsEntries),
+    'From Team':        fromTeam,
+    'From Type':        fromType,
+    'From Label':       fromType === 'individual' ? fromName : fromTeam,
+    'To Team':          toTeam,
+    'To Type':          toType,
+    'To Label':         toType === 'individual' ? toName : toTeam,
+    'Categories':       allTags.join(', '),
+    'Strengths':        formatEntries(strengthsEntries),
     'Areas to Improve': formatEntries(improveEntries),
-    'Comments':        formatEntries(otherEntries),
-    'Timestamp':       new Date().toISOString()
+    'Comments':         formatEntries(otherEntries),
+    'Timestamp':        new Date().toISOString()
   };
 
   const btn = document.getElementById('submit-btn');
@@ -546,27 +902,50 @@ async function submitFeedback() {
     await db.collection('feedback').add(payload);
     document.getElementById('form-container').style.display    = 'none';
     document.getElementById('success-container').style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   } catch (err) {
     showToast('Submission failed: ' + err.message, 'error');
   } finally {
-    btn.disabled = false; btn.textContent = 'Submit Feedback Anonymously';
+    btn.disabled = false; btn.textContent = 'Submit Anonymously ✓';
   }
 }
 
 function resetForm() {
   document.getElementById('form-container').style.display    = 'block';
   document.getElementById('success-container').style.display = 'none';
+
+  // Reset fields
   ['from-team','to-team'].forEach(id => document.getElementById(id).value = '');
   ['from-name','to-name'].forEach(id => document.getElementById(id).value = '');
   ['from-name-group','to-name-group'].forEach(id => document.getElementById(id).style.display = 'none');
   document.querySelectorAll('.radio-pill').forEach(p => p.classList.remove('selected'));
   document.querySelectorAll('.radio-pill:first-of-type').forEach(p => p.classList.add('selected'));
+
   ['strengths','improve','other'].forEach(section => {
     const list = document.getElementById(section + '-list');
     [...list.querySelectorAll('.guided-entry')].forEach((e, i) => { if (i > 0) e.remove(); });
     list.querySelectorAll('textarea').forEach(t => t.value = '');
     list.querySelectorAll('.tag').forEach(t => t.classList.remove('selected'));
+    list.querySelectorAll('.custom-cat-wrap').forEach(w => { w.classList.remove('visible'); w.querySelector('input').value = ''; });
+    undoSkip(section);
+    document.getElementById('body-' + section).classList.remove('collapsed');
+    document.getElementById('toggle-' + section).classList.remove('collapsed');
+    document.getElementById('badge-' + section).classList.remove('visible');
   });
+
+  document.getElementById('summary-bar').classList.remove('visible');
+  updateSummaryBar();
+
+  // Return to step 1
+  document.getElementById('panel-' + currentStep).classList.remove('active');
+  currentStep = 1;
+  document.getElementById('panel-1').classList.add('active');
+  for (let i = 1; i <= TOTAL_STEPS; i++) {
+    const wp = document.getElementById('wp-' + i);
+    wp.classList.remove('active','done');
+    if (i === 1) wp.classList.add('active');
+  }
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 // ─── GUIDED ENTRIES ────────────────────────────────────────────
@@ -576,12 +955,11 @@ function addEntry(section) {
   const isStr = section === 'strengths';
   const isOth = section === 'other';
 
-  const whatLabel  = isStr ? 'What did they do well?' : isOth ? 'Your comment' : 'What could be improved?';
-  const whatPH     = isStr ? 'e.g. Strong analytical thinking' : isOth ? 'e.g. Great team to collaborate with…' : 'e.g. Meeting preparation';
-  const ctxPH      = isStr ? 'e.g. During the budget review they identified a discrepancy no one else noticed…'
-                   : isOth ? 'e.g. Particularly during the year-end close process…'
-                   : 'e.g. Several meetings ran over time because materials were shared late…';
-  const ctxOptional = ' <span style="font-style:italic;">(optional)</span>';
+  const whatLabel = isStr ? 'What did they do well?' : isOth ? 'Your comment' : 'What could be improved?';
+  const whatPH    = isStr ? 'e.g. Strong analytical thinking' : isOth ? 'e.g. Great team to collaborate with…' : 'e.g. Meeting preparation';
+  const ctxPH     = isStr ? 'e.g. They identified a discrepancy during the budget review…'
+                  : isOth ? 'e.g. Particularly during year-end close…'
+                  : 'e.g. Materials were often shared late, causing meetings to run over…';
 
   const div = document.createElement('div');
   div.className = 'guided-entry';
@@ -596,15 +974,19 @@ function addEntry(section) {
       <textarea class="${section}-what" placeholder="${whatPH}" style="min-height:70px;"></textarea>
     </div>
     <div class="form-group" style="margin-bottom:8px;">
-      <label style="font-weight:400;color:var(--muted);">Describe the circumstances or give a specific example${ctxOptional}</label>
+      <label style="font-weight:400;color:var(--muted);">Specific example <span style="font-style:italic;">(optional)</span></label>
       <textarea class="${section}-context" placeholder="${ctxPH}" style="min-height:70px;"></textarea>
     </div>
     <div class="form-group" style="margin-bottom:0;">
       <label style="font-weight:400;color:var(--muted);">Category <span style="font-style:italic;">(optional)</span></label>
       <div class="tags entry-tags"></div>
+      <div class="custom-cat-wrap"><input type="text" class="custom-cat-input" placeholder="Describe your custom category…" /></div>
     </div>`;
   list.appendChild(div);
   seedTags(div.querySelector('.entry-tags'));
+  div.querySelectorAll('textarea').forEach(ta => {
+    ta.addEventListener('input', () => checkCompletion(section));
+  });
 }
 
 function collectEntries(section) {
@@ -640,12 +1022,10 @@ async function loadDashboard() {
   const listEl = document.getElementById('fb-list');
   listEl.innerHTML = `<div class="loading"><div class="spinner"></div>Loading submissions…</div>`;
   document.getElementById('stats-row').innerHTML = '';
-
   if (!db) {
-    listEl.innerHTML = `<div class="empty-state"><div class="empty-icon">⚙️</div><p>Firebase is not configured. Edit the FIREBASE_CONFIG in index.html.</p></div>`;
+    listEl.innerHTML = `<div class="empty-state"><div class="empty-icon">⚙️</div><p>Firebase is not configured.</p></div>`;
     return;
   }
-
   try {
     const snapshot = await db.collection('feedback').orderBy('Timestamp', 'desc').get();
     allData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -664,9 +1044,9 @@ function renderDashboard() {
   const filterTag  = document.getElementById('filter-tag').value;
 
   const filtered = allData.filter(e => {
-    if (filterTo   && e['To Team']   !== filterTo)                  return false;
-    if (filterFrom && e['From Team'] !== filterFrom)                return false;
-    if (filterTag  && !(e['Categories']||'').includes(filterTag))   return false;
+    if (filterTo   && e['To Team']   !== filterTo)                return false;
+    if (filterFrom && e['From Team'] !== filterFrom)              return false;
+    if (filterTag  && !(e['Categories']||'').includes(filterTag)) return false;
     return true;
   });
 
@@ -674,21 +1054,17 @@ function renderDashboard() {
   document.getElementById('stats-row').innerHTML = `
     <div class="stat-card"><div class="stat-num">${allData.length}</div><div class="stat-label">Total Submissions</div></div>
     <div class="stat-card"><div class="stat-num">${filtered.length}</div><div class="stat-label">Filtered Results</div></div>
-    <div class="stat-card"><div class="stat-num">${teamsWithFeedback}</div><div class="stat-label">Teams With Feedback</div></div>
-  `;
+    <div class="stat-card"><div class="stat-num">${teamsWithFeedback}</div><div class="stat-label">Teams With Feedback</div></div>`;
 
   const listEl = document.getElementById('fb-list');
   if (!filtered.length) {
     listEl.innerHTML = `<div class="empty-state"><div class="empty-icon">💬</div><p>No submissions${filterTo||filterFrom||filterTag?' matching filters':''}.</p></div>`;
     return;
   }
-
-  // Format timestamp nicely
   const fmtDate = iso => {
     try { return new Date(iso).toLocaleString('en-GB', { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' }); }
     catch { return iso; }
   };
-
   listEl.innerHTML = filtered.map(e => {
     const cats = (e['Categories']||'').split(',').map(t=>t.trim()).filter(Boolean);
     const tags = cats.map(t => `<span class="badge badge-tag">${escHtml(t)}</span>`).join('');
@@ -700,9 +1076,9 @@ function renderDashboard() {
           ${tags}
           <span class="fb-date">${escHtml(fmtDate(e['Timestamp']))}</span>
         </div>
-        ${e['Strengths'] ? `<div class="fb-section"><div class="fb-section-label">✅ Strengths</div><div class="fb-section-value">${escHtml(e['Strengths'])}</div></div>` : ''}
+        ${e['Strengths']        ? `<div class="fb-section"><div class="fb-section-label">✅ Strengths</div><div class="fb-section-value">${escHtml(e['Strengths'])}</div></div>` : ''}
         ${e['Areas to Improve'] ? `<div class="fb-section"><div class="fb-section-label">🔧 Areas to Improve</div><div class="fb-section-value">${escHtml(e['Areas to Improve'])}</div></div>` : ''}
-        ${e['Comments'] ? `<div class="fb-section"><div class="fb-section-label">💬 Comments</div><div class="fb-section-value">${escHtml(e['Comments'])}</div></div>` : ''}
+        ${e['Comments']         ? `<div class="fb-section"><div class="fb-section-label">💬 Comments</div><div class="fb-section-value">${escHtml(e['Comments'])}</div></div>` : ''}
       </div>`;
   }).join('');
 }
