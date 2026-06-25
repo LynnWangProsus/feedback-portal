@@ -326,6 +326,7 @@
       <div class="form-group">
         <label>Your team <span class="req">*</span></label>
         <input type="text" id="from-team" list="teams-datalist" placeholder="Type or select your team…" autocomplete="off" oninput="updateSummaryBar()" />
+        <div class="helper-text">Teams listed A–Z</div>
       </div>
       <div class="form-group">
         <label>Submitting as</label>
@@ -350,6 +351,7 @@
         <label>Recipient team <span class="req">*</span></label>
         <input type="text" id="to-team" list="teams-datalist" placeholder="Type or select a team…" autocomplete="off" oninput="updateSummaryBar()" />
         <datalist id="teams-datalist"></datalist>
+        <div class="helper-text">Teams listed A–Z</div>
       </div>
       <div class="form-group">
         <label>Giving feedback to</label>
@@ -627,12 +629,12 @@ const AUTH_KEY  = 'fb_portal_admin_auth';
 
 // ─── TEAMS & TAGS ──────────────────────────────────────────────
 const TEAMS = [
-  "Valuations team",
   "CoSec team","Deloitte team","Despegar team","eMAG team","Executive team",
   "Financial Reporting team","GoodHabitz team","HR team","iFood team",
   "Iyzico team","JET team","KPMG team","OLX team","PayU team",
   "SFP&A team","Shares Estimate team","Shares Office team",
-  "Stack Overflow team","TAL team","Treasury team"
+  "Stack Overflow team","TAL team","Treasury team",
+  "Valuations team","Ventures team"
 ];
 
 const TAGS = [
@@ -952,9 +954,16 @@ function resetForm() {
 }
 
 // ─── GUIDED ENTRIES ────────────────────────────────────────────
+const MAX_ENTRIES = 20;
+
 function addEntry(section) {
   const list  = document.getElementById(section + '-list');
-  const num   = list.querySelectorAll('.guided-entry').length + 1;
+  const count = list.querySelectorAll('.guided-entry').length;
+  if (count >= MAX_ENTRIES) {
+    showToast(`Maximum ${MAX_ENTRIES} entries per section.`, 'error');
+    return;
+  }
+  const num   = count + 1;
   const isStr = section === 'strengths';
   const isOth = section === 'other';
 
