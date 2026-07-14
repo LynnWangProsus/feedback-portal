@@ -1058,7 +1058,15 @@ async function loadDashboard() {
     allData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
     renderDashboard();
   } catch (err) {
-    listEl.innerHTML = `<div class="empty-state"><div class="empty-icon">❌</div><p>Could not load data: ${escHtml(err.message)}</p></div>`;
+    if (err.code === 'permission-denied') {
+      listEl.innerHTML = `<div class="empty-state"><div class="empty-icon">🔒</div>
+        <p><strong>Live in-app dashboard is disabled.</strong><br>
+        Submissions are anonymous and write-only by design — Firestore security rules block reads from this page.
+        View or export all feedback from the <a href="https://console.firebase.google.com/project/${FIREBASE_CONFIG.projectId}/firestore/data" target="_blank" rel="noopener">Firebase console</a> instead
+        (Firestore → Data → <code>${FEEDBACK_COLLECTION}</code> collection).</p></div>`;
+    } else {
+      listEl.innerHTML = `<div class="empty-state"><div class="empty-icon">❌</div><p>Could not load data: ${escHtml(err.message)}</p></div>`;
+    }
   }
 }
 
